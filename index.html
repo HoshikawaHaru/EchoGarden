@@ -3,16 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- 🍎 iOS 独有设置：全屏显示 + 状态栏样式 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Echo Garden">
+
+  <!-- 🌈 浏览器主题色，动态可变 -->
   <meta name="theme-color" content="#dcd6f7">
+
+  <!-- 页面标题 -->
   <title>EchoGarden</title>
 
-  <!-- 样式 -->
+  <!-- 🍃 样式 -->
   <link rel="stylesheet" href="css/main.css">
 
-  <!-- 页面图标，可自行换成本地 assets/icons/icon.png -->
-  <link rel="icon" href="assets/icons/icon.png" type="image/png">
+  <!-- 🍎 桌面/启动图标，可统一引用一张512px PNG -->
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
+  <link rel="icon" href="assets/icons/icon512.png" type="image/png">
+
+  <!-- 🔧 动态主题管理 -->
+  <script src="js/themeManager.js" defer></script>
+  <script src="js/main.js" defer></script>
 </head>
 
 <body>
@@ -63,3 +75,4 @@
   <script src="js/main.js" defer></script>
 </body>
 </html>
+
