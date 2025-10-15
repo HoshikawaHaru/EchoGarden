@@ -27,6 +27,14 @@ document.querySelectorAll(".app-icon").forEach(icon => {
   });
 });
 
+//JS 动态主题切换
+function setThemeBackground(imageUrl, themeColor = '#000000', isLight = false) {
+  document.body.style.backgroundImage = `url(${imageUrl})`;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
+  document.body.classList.toggle('light', isLight);
+}
+
+
 window.goHome = function() {
   appContainer.innerHTML = "";
   appContainer.style.display = "none";
