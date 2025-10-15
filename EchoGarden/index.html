@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#dcd6f7">
+  <title>EchoGarden</title>
+
+  <!-- 样式 -->
+  <link rel="stylesheet" href="css/main.css">
+
+  <!-- 页面图标，可自行换成本地 assets/icons/icon.png -->
+  <link rel="icon" href="assets/icons/icon.png" type="image/png">
+</head>
+
+<body>
+  <!-- 顶部状态栏 -->
+  <header id="status-bar">
+    <div id="time"></div>
+    <div id="status-icons">📶 🔋</div>
+  </header>
+
+  <!-- 主屏 -->
+  <main id="homescreen">
+    <div class="app-grid">
+      <div class="app-icon" data-app="message">
+        <img src="assets/icons/message.png" alt="消息">
+        <p>消息</p>
+      </div>
+      <div class="app-icon" data-app="diary">
+        <img src="assets/icons/diary.png" alt="日记">
+        <p>日记</p>
+      </div>
+      <div class="app-icon" data-app="tarot">
+        <img src="assets/icons/tarot.png" alt="塔罗">
+        <p>塔罗</p>
+      </div>
+      <div class="app-icon" data-app="forum">
+        <img src="assets/icons/forum.png" alt="论坛">
+        <p>论坛</p>
+      </div>
+      <div class="app-icon" data-app="words">
+        <img src="assets/icons/words.png" alt="背单词">
+        <p>单词</p>
+      </div>
+      <div class="app-icon" data-app="memo">
+        <img src="assets/icons/memo.png" alt="心声">
+        <p>心声</p>
+      </div>
+      <div class="app-icon" data-app="settings">
+        <img src="assets/icons/settings.png" alt="设置">
+        <p>设置</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 动态加载 app 的容器 -->
+  <section id="app-container" style="display:none;"></section>
+
+  <!-- JS -->
+  <script src="js/main.js" defer></script>
+</body>
+</html>
