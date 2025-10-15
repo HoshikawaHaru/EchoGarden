@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #dcd6f7, #f3ecff);
+  font-family: "PingFang SC", "Segoe UI", sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  grid-gap: 25px;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.app-icon img {
+  width: 70px;
+  border-radius: 20px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
