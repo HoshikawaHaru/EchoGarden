@@ -52,8 +52,8 @@ padding-top: env(safe-area-inset-top);
 /* === 主题切换按钮 === */
 #theme-toggle {
   position: fixed;
-  top: 12px;
-  right: 12px;
+  top: calc(12px + env(safe-area-inset-top));
+  right: calc(12px + env(safe-area-inset-right));
   z-index: 100;
   background: rgba(255, 255, 255, 0.25);
   color: white;
