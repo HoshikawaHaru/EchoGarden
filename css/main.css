@@ -2,53 +2,44 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: calc(var(--vh, 1vh) * 100);  /* 👈 替换原来的 height: 100vh; 和 height: 100dvh; */
+  height: 100%;
   width: 100%;
   background: url('assets/bg/night.jpeg') no-repeat center center;
   background-size: cover;
-  background-attachment: scroll;
+  background-attachment: fixed;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
-  overflow: hidden;
-
-  /* 让背景固定全屏 */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
+
 
 
 
 /* === 主屏 app 网格 === */
 #homescreen {
-  position: fixed;  
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
   box-sizing: border-box;
-  overflow: hidden;
 
-  /* 安全区域适配 */
-  padding-top: max(env(safe-area-inset-top), 20px);  /* 👈 至少留20px */
+  /* 安全区适配 */
+  padding-top: max(env(safe-area-inset-top), 20px);
   padding-bottom: max(env(safe-area-inset-bottom), 20px);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
+
 
 .app-grid {
   display: grid;
   grid-template-columns: repeat(4, 80px);
   grid-gap: 24px 16px;
   justify-content: center;
-  align-content: center;  /* 👈 加这行，确保垂直居中 */
+  align-content: center;
+  height: 100%;
 }
+
 
 .app-icon {
   text-align: center;
