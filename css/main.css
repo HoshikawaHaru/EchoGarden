@@ -34,6 +34,17 @@ html, body {
   padding-right: env(safe-area-inset-right);
 }
 
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;  /* 继承背景 */
+  z-index: -1;  /* 确保背景在内容下面 */
+}
+
 .app-grid {
   display: grid;
   grid-template-columns: repeat(4, 80px);
