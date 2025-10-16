@@ -26,3 +26,14 @@ isLight = prefersLight;
 themeToggle.textContent = prefersLight ? '🌞' : '🌙';
 
 themeToggle.addEventListener('click', toggleTheme);
+
+// === 修正 iOS Safari 灵动岛高度丢失问题 ===
+function fixViewportHeight() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+// 初始化 & 监听窗口变化
+fixViewportHeight();
+window.addEventListener('resize', fixViewportHeight);
+window.addEventListener('orientationchange', fixViewportHeight);
