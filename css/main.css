@@ -2,26 +2,34 @@
 html, body {
   margin: 0;
   padding: 0;
-  min-height: 100%;  /* 用 min-height 代替固定高度 */
+  height: 100%;
   width: 100%;
-  background: url('assets/bg/night.jpeg') no-repeat center center fixed;
-  background-size: cover;
-  background-attachment: scroll;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
+
+  /* 用伪元素设置背景，避免 Safari 渲染问题 */
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('assets/bg/night.jpeg') no-repeat center center / cover;
+  z-index: -1; /* 确保背景在内容下面 */
+  transition: background-image 0.5s ease; /* 背景切换平滑 */
 }
 
 /* === 主屏 app 网格 === */
 #homescreen {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* 更自然对齐，避免多余空白 */
-  flex-direction: column;
-  height: 100%; /* 让内容自适应 */
+  align-items: center;
+  height: 100%;
   box-sizing: border-box;
 
-  /* 安全区域适配 */
+  /* 安全区适配 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
@@ -33,8 +41,8 @@ html, body {
   grid-template-columns: repeat(4, 80px);
   grid-gap: 24px 16px;
   justify-content: center;
-  align-content: center;  /* 保证内容垂直居中 */
-  margin-top: 0;  /* 防止顶部或底部多余空白 */
+  align-content: center;
+  height: 100%;
 }
 
 .app-icon {
@@ -44,15 +52,15 @@ html, body {
 }
 
 .app-icon img {
-  width: 60px;  /* 👈 改小一点，适配4列 */
+  width: 60px;
   height: 60px;
   border-radius: 20%;
   backdrop-filter: blur(5px);
-  background: rgba(255, 255, 255, 0.1);  /* 👈 加个半透明背景 */
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .app-icon p {
-  font-size: 11px;  /* 👈 加这个，文字大小 */
+  font-size: 11px;
   margin-top: 4px;
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
@@ -75,12 +83,11 @@ html, body {
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-#theme-toggle:active {  /* 👈 改成 :active，移动端没有 hover */
+#theme-toggle:active {
   background: rgba(255, 255, 255, 0.35);
   transform: scale(0.95);
 }
 
-/* 浅色模式下反色 */
 body.light #theme-toggle {
   background: rgba(0, 0, 0, 0.1);
   color: black;
@@ -93,8 +100,8 @@ body.light #theme-toggle {
   right: 0;
   bottom: 0;
   display: none;
-  background: rgba(0, 0, 0, 0.9);  /* 👈 加个背景色 */
-  overflow-y: auto;  /* 👈 允许滚动 */
+  background: rgba(0, 0, 0, 0.9);
+  overflow-y: auto;
 
   /* 安全区域内边距 */
   padding-top: env(safe-area-inset-top);
