@@ -125,3 +125,16 @@ body.light #theme-toggle {
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
 }
+
+/* === 灵动岛强制覆盖层 === */
+#full-bg {
+  position: absolute;
+  top: -50px;           /* 向上延伸，覆盖灵动岛区域 */
+  left: 0;
+  right: 0;
+  height: calc(100dvh + 50px);
+  background: inherit;
+  background-size: cover;
+  background-position: center;
+  z-index: -2;          /* 比 body::before 更底层 */
+}
