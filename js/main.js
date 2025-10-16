@@ -54,10 +54,10 @@ function setThemeBackground(imageUrl, themeColor = '#000000', isLightMode = fals
 function toggleTheme() {
   isLight = !isLight;
   if (isLight) {
-    setThemeBackground('assets/bg/day.jpg', '#f4f4f4', true);
+    setThemeBackground('assets/bg/day.jpeg', '#f4f4f4', true);
     themeToggle.textContent = '🌞';
   } else {
-    setThemeBackground('assets/bg/night.jpg', '#000000', false);
+    setThemeBackground('assets/bg/night.jpeg', '#000000', false);
     themeToggle.textContent = '🌙';
   }
 }
