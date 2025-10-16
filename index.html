@@ -2,18 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width,
-                 initial-scale=1.0,
-                 maximum-scale=1.0,
-                 user-scalable=no,
-                 viewport-fit=cover">
-
-  <!-- 🍎 iOS 全屏与状态栏 - 关键配置 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- 🍎 iOS 全屏与状态栏 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <!-- black-translucent 允许内容延伸到状态栏下方 -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- 透明主题色确保背景延伸 -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="rgba(0,0,0,0)">
 
   <title>Echo Garden</title>
@@ -21,49 +14,23 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
   <link rel="icon" href="assets/icons/icon512.png" type="image/png">
-  
-  <!-- 预加载背景图片 -->
-  <link rel="preload" as="image" href="assets/bg/night.jpeg">
-  <link rel="preload" as="image" href="assets/bg/day.jpeg">
-  
   <script src="js/main.js" defer></script>
 </head>
 
 <body>
   <!-- 主题切换 -->
-  <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  <button id="theme-toggle" aria-label="切换主题">🌗</button>
 
   <!-- 主屏 -->
   <main id="homescreen">
     <div class="app-grid">
-      <div class="app-icon" data-app="message">
-        <img src="assets/icons/message.png" alt="消息">
-        <p>消息</p>
-      </div>
-      <div class="app-icon" data-app="diary">
-        <img src="assets/icons/diary.png" alt="日记">
-        <p>日记</p>
-      </div>
-      <div class="app-icon" data-app="tarot">
-        <img src="assets/icons/tarot.png" alt="塔罗">
-        <p>塔罗</p>
-      </div>
-      <div class="app-icon" data-app="forum">
-        <img src="assets/icons/forum.png" alt="论坛">
-        <p>论坛</p>
-      </div>
-      <div class="app-icon" data-app="words">
-        <img src="assets/icons/words.png" alt="单词">
-        <p>单词</p>
-      </div>
-      <div class="app-icon" data-app="memo">
-        <img src="assets/icons/memo.png" alt="心声">
-        <p>心声</p>
-      </div>
-      <div class="app-icon" data-app="settings">
-        <img src="assets/icons/settings.png" alt="设置">
-        <p>设置</p>
-      </div>
+      <div class="app-icon" data-app="message"><img src="assets/icons/message.png"><p>消息</p></div>
+      <div class="app-icon" data-app="diary"><img src="assets/icons/diary.png"><p>日记</p></div>
+      <div class="app-icon" data-app="tarot"><img src="assets/icons/tarot.png"><p>塔罗</p></div>
+      <div class="app-icon" data-app="forum"><img src="assets/icons/forum.png"><p>论坛</p></div>
+      <div class="app-icon" data-app="words"><img src="assets/icons/words.png"><p>单词</p></div>
+      <div class="app-icon" data-app="memo"><img src="assets/icons/memo.png"><p>心声</p></div>
+      <div class="app-icon" data-app="settings"><img src="assets/icons/settings.png"><p>设置</p></div>
     </div>
   </main>
 
