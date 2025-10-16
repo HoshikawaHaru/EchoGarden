@@ -54,14 +54,14 @@ function setThemeBackground(imageUrl, themeColor = '#000000', isLightMode = fals
 function toggleTheme() {
   isLight = !isLight;
   if (isLight) {
-    setThemeBackground('assets/bg/day.jpeg', '#f4f4f4', true);
-    themeToggle.textContent = '🌞';
-  } else {
-    setThemeBackground('assets/bg/night.jpeg', '#000000', false);
-    themeToggle.textContent = '🌙';
-  }
+  setThemeBackground('/EchoGarden/assets/bg/day.jpeg', '#f4f4f4', true);
+  themeToggle.textContent = '🌞';
+} else {
+  setThemeBackground('/EchoGarden/assets/bg/night.jpeg', '#000000', false);
+  themeToggle.textContent = '🌙';
+}
 }
 
 // 默认夜间主题
-setThemeBackground('assets/bg/night.jpg', '#000000', false);
+setThemeBackground('/EchoGarden/assets/bg/night.jpeg', '#000000', false);
 themeToggle.addEventListener('click', toggleTheme);
