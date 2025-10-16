@@ -5,14 +5,14 @@ function setThemeColor(color, isLightMode = false) {
   // 更新 <meta name="theme-color">
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   if (themeMeta) themeMeta.setAttribute('content', color);
-
+  
   // 更新 iOS 状态栏样式
   const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
   if (statusMeta) {
     statusMeta.setAttribute('content', isLightMode ? 'default' : 'black-translucent');
   }
-
-  // 可选：更新虚拟状态栏文字颜色（如果你有自制 header）
+  
+  // 更新虚拟状态栏文字颜色
   const statusBar = document.getElementById('status-bar');
   if (statusBar) {
     statusBar.style.color = isLightMode ? '#000' : '#fff';
