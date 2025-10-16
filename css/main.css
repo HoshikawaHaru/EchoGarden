@@ -1,26 +1,30 @@
 /* === 全屏背景设置 === */
-html, body {
+
+/* 步骤1: 设置 <html> 元素 */
+html {
+  height: 100%; /* 关键点1: 让 html 元素作为根基，高度占满父级(视口) */
   margin: 0;
   padding: 0;
-  height: calc(var(--vh, 1vh) * 100);  /* 👈 替换原来的 height: 100vh; 和 height: 100dvh; */
+}
+
+/* 步骤2: 设置 <body> 元素 */
+body {
+  margin: 0;
+  padding: 0;
   width: 100%;
+  height: calc(var(--vh, 1vh) * 100); /* 关键点2: 使用 JS 动态计算的高度，确保精确匹配可视区域 */
+
+  /* --- 背景相关的核心修正 --- */
   background: url('assets/bg/night.jpeg') no-repeat center center;
   background-size: cover;
-  background-attachment: scroll;
+  background-attachment: fixed; /* 关键点3: 这是解决背景放大问题的核心！让背景相对于视口固定，而不是随body元素尺寸变化 */
+
+  /* --- 其他保持不变 --- */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
-  overflow: hidden;
-
-  /* 让背景固定全屏 */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  overflow: hidden; /* 防止body本身滚动 */
 }
-
-
 
 /* === 主屏 app 网格 === */
 #homescreen {
