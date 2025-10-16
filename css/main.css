@@ -2,11 +2,11 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;  /* 用 min-height 代替固定高度 */
   width: 100%;
-  background: url('assets/bg/night.jpeg') no-repeat center center;
+  background: url('assets/bg/night.jpeg') no-repeat center center fixed;
   background-size: cover;
-  background-attachment: fixed;
+  background-attachment: scroll;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
@@ -16,12 +16,12 @@ html, body {
 #homescreen {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
+  align-items: flex-start; /* 更自然对齐，避免多余空白 */
+  flex-direction: column;
+  height: 100%; /* 让内容自适应 */
   box-sizing: border-box;
-  padding-top: calc(env(safe-area-inset-top) + 6vh); /*👈 可选微调（让不同屏幕比例都居中） */
 
-  /* 安全区适配 */
+  /* 安全区域适配 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
@@ -33,9 +33,9 @@ html, body {
   grid-template-columns: repeat(4, 80px);
   grid-gap: 24px 16px;
   justify-content: center;
-  align-content: center;
+  align-content: center;  /* 保证内容垂直居中 */
+  margin-top: 0;  /* 防止顶部或底部多余空白 */
 }
-
 
 .app-icon {
   text-align: center;
