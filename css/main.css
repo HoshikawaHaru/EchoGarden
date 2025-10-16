@@ -4,54 +4,47 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: url('assets/bg/night.jpeg') no-repeat center center;
-  background-size: cover;   /* 确保背景始终填满屏幕 */
-  background-position: center center;  /* 保证背景居中显示 */
-  background-attachment: scroll;
-  background-color: #000;  /* 防止加载时出现白色背景 */
+  background: url('assets/bg/night.jpeg') no-repeat center center / cover;
+  background-color: #000;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
-
-  /* 防止白边出现 */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  position: relative;
 }
 
-/* === 主屏网格 === */
+/* 关键：利用伪元素确保背景延伸到状态栏与灵动岛 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: inherit;
+  background-attachment: fixed;
+  z-index: -1;
+}
+
+/* 主屏内容布局 */
 #homescreen {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  box-sizing: border-box;
   flex-direction: column;
+  box-sizing: border-box;
 
-  padding-top: env(safe-area-inset-top);  /* 保证顶部延伸到灵动岛区域 */
-  padding-bottom: env(safe-area-inset-bottom);  /* 适配底部 */
+  /* 安全区适配 */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
 
-/* === 背景伪元素，确保背景覆盖整个屏幕，包括灵动岛 === */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: inherit;  /* 继承 body 的背景样式 */
-  z-index: -1;          /* 背景置于内容后 */
+/* 防止 Safari 地址栏出现跳动导致内容超出 */
+@supports (height: 100dvh) {
+  html, body {
+    height: 100dvh;
+  }
 }
 
-/* === App 网格布局 === */
 .app-grid {
   display: grid;
   grid-template-columns: repeat(4, 80px);
@@ -101,6 +94,11 @@ body::after {
 #theme-toggle:active {
   background: rgba(255, 255, 255, 0.35);
   transform: scale(0.95);
+}
+
+body.light #theme-toggle {
+  background: rgba(0, 0, 0, 0.1);
+  color: black;
 }
 
 /* === App 页面容器 === */
