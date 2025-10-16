@@ -31,7 +31,9 @@ themeToggle.addEventListener('click', toggleTheme);
 
 // ============ 修正 iOS 视口高度丢失（给内容容器用） ============
 function fixViewportHeight() {
-  const vh = window.innerHeight * 0.01;            // 真实可视高度
+  const safeBottom = parseFloat(getComputedStyle(document.documentElement)
+                      .getPropertyValue('--safe-bottom')) || 0;
+  const vh = (window.innerHeight + safeBottom) * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 fixViewportHeight();
