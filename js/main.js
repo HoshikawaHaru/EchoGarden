@@ -1,7 +1,8 @@
 // 页面切换
 const home = document.getElementById("homescreen");
 const appContainer = document.getElementById("app-container");
-[cite_start]document.querySelectorAll(".app-icon").forEach(icon => { /* [cite: 19] */
+
+document.querySelectorAll(".app-icon").forEach(icon => {
   icon.addEventListener("click", async () => {
     const app = icon.dataset.app;
     home.style.display = "none";
@@ -15,35 +16,36 @@ const appContainer = document.getElementById("app-container");
     }
   });
 });
-[cite_start]window.goHome = function() { /* [cite: 20] */
+
+window.goHome = function() {
   appContainer.innerHTML = "";
   appContainer.style.display = "none";
   home.style.display = "flex";
 };
 
 // === 动态主题切换 ===
-const themeToggle = document.getElementById('theme-toggle'); [cite_start]/* [cite: 21] */
+const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
-[cite_start]function setThemeBackground(imageUrl, isLightMode = false) { /* [cite: 22] */
+function setThemeBackground(imageUrl, isLightMode = false) {
   document.body.style.backgroundImage = `url(${imageUrl})`;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', 'rgba(0,0,0,0)');
-  document.body.classList.toggle('light', isLightMode); [cite_start]/* [cite: 22] */
+  document.body.classList.toggle('light', isLightMode);
 }
 
 function toggleTheme() {
   isLight = !isLight;
   if (isLight) {
     setThemeBackground('assets/bg/day.jpeg', true);
-    themeToggle.textContent = '🌞'; [cite_start]/* [cite: 23] */
+    themeToggle.textContent = '🌞';
   } else {
     setThemeBackground('assets/bg/night.jpeg', false);
-    themeToggle.textContent = '🌙'; [cite_start]/* [cite: 24] */
+    themeToggle.textContent = '🌙';
   }
 }
 
 // 默认主题根据系统外观自动匹配
-const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches; [cite_start]/* [cite: 25] */
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
 setThemeBackground(prefersLight ? 'assets/bg/day.jpeg' : 'assets/bg/night.jpeg', prefersLight);
 isLight = prefersLight;
 themeToggle.textContent = prefersLight ? '🌞' : '🌙';
