@@ -21,24 +21,25 @@
   <button id="theme-toggle" aria-label="切换主题">🌗</button>
   
 <!-- === 顶部信息组件（电量条 + 圆形进度） === -->
-<div class="top-panel">
-  <!-- 左侧圆形进度环 -->
-  <div class="battery-circle-box">
-    <svg class="battery-circle" width="56" height="56" viewBox="0 0 56 56">
-      <circle class="bg" cx="28" cy="28" r="24" />
-      <circle class="progress" cx="28" cy="28" r="24" />
+<div class="top-widgets">
+  <!-- 左侧圆形面板 -->
+  <div class="circle-widget">
+    <svg class="circle-chart" width="64" height="64" viewBox="0 0 64 64">
+      <circle class="bg" cx="32" cy="32" r="28"></circle>
+      <circle class="progress" cx="32" cy="32" r="28"></circle>
     </svg>
-    <span id="battery-text">--%</span>
+    <span class="circle-text" id="circle-value">--%</span>
   </div>
 
-  <!-- 右侧电量条 -->
-  <div class="battery-bar-box">
-    <div class="battery-bar">
-      <div class="battery-fill" id="battery-fill"></div>
+  <!-- 右侧条形面板 -->
+  <div class="bar-widget">
+    <div class="bar-inner">
+      <div class="bar-fill" id="bar-fill"></div>
     </div>
-    <div class="battery-label">Battery</div>
+    <div class="bar-label">Battery</div>
   </div>
 </div>
+
 
 <style>
 .top-panel {
@@ -145,6 +146,7 @@ navigator.getBattery && navigator.getBattery().then(battery => {
   <section id="app-container" style="display:none;"></section>
 </body>
 </html>
+
 
 
 
