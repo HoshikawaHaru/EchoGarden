@@ -3,7 +3,7 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100dvh;  /* ✅ 优先使用 dvh，能动态匹配屏幕可视高度 */
+  height: 100dvh;
   background: url('assets/bg/night.jpeg') no-repeat center center;
   background-size: cover;
   background-position: center center;
@@ -12,8 +12,6 @@ html, body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
-
-  /* ✅ 保证背景固定且覆盖安全区 */
   position: fixed;
   inset: 0;
 }
@@ -26,7 +24,6 @@ body::before {
   background: inherit;
   background-size: cover;
   z-index: -1;
-  /* 适配安全区，防止白边 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
@@ -48,42 +45,43 @@ body::before {
   padding-right: env(safe-area-inset-right);
 }
 
-/* === 主屏 App 网格布局 === */
+/* === 主屏 App 网格 === */
 .app-grid {
   display: grid;
-  grid-template-columns: repeat(4, 80px); [cite_start]/* [cite: 10] */
-  grid-gap: 24px 16px; [cite_start]/* [cite: 10] */
+  grid-template-columns: repeat(4, 80px);
+  grid-gap: 24px 16px;
   justify-content: center;
   align-content: center;
 }
 
+/* === 单个图标样式 === */
 .app-icon {
   text-align: center;
   color: white;
-  user-select: none; [cite_start]/* [cite: 11] */
+  user-select: none;
 }
 
 .app-icon img {
-  width: 60px; [cite_start]/* [cite: 34] */
+  width: 60px;
   height: 60px;
   border-radius: 20%;
   backdrop-filter: blur(5px);
-  background: rgba(255, 255, 255, 0.1); [cite_start]/* [cite: 12] */
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .app-icon p {
-  font-size: 11px; [cite_start]/* [cite: 13] */
+  font-size: 11px;
   margin-top: 4px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5); [cite_start]/* [cite: 13] */
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 /* === 主题切换按钮 === */
 #theme-toggle {
   position: fixed;
-  top: calc(12px + env(safe-area-inset-top)); [cite_start]/* 适配灵动岛顶部 [cite: 13] */
-  right: calc(12px + env(safe-area-inset-right)); [cite_start]/* [cite: 14] */
+  top: calc(12px + env(safe-area-inset-top));
+  right: calc(12px + env(safe-area-inset-right));
   z-index: 100;
-  background: rgba(255, 255, 255, 0.25); [cite_start]/* [cite: 14] */
+  background: rgba(255, 255, 255, 0.25);
   color: white;
   border: none;
   border-radius: 50%;
@@ -91,29 +89,27 @@ body::before {
   height: 42px;
   font-size: 18px;
   backdrop-filter: blur(8px);
-  cursor: pointer; [cite_start]/* [cite: 15] */
+  cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 #theme-toggle:active {
   background: rgba(255, 255, 255, 0.35);
-  transform: scale(0.95); [cite_start]/* [cite: 16] */
+  transform: scale(0.95);
 }
 body.light #theme-toggle {
   background: rgba(0, 0, 0, 0.1);
-  color: black; [cite_start]/* [cite: 17] */
+  color: black;
 }
 
 /* === App 页面容器 === */
 #app-container {
-  position: fixed; [cite_start]/* 保持固定，覆盖主屏 [cite: 18] */
-  inset: 0; [cite_start]/* [cite: 41] */
+  position: fixed;
+  inset: 0;
   display: none;
   background: rgba(0, 0, 0, 0.9);
-  overflow-y: auto; [cite_start]/* 允许滚动 [cite: 18] */
-  
-  /* 安全区域内边距 */
+  overflow-y: auto;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left); [cite_start]/* [cite: 43] */
-  padding-right: env(safe-area-inset-right); [cite_start]/* [cite: 43] */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
