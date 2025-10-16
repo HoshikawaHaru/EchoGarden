@@ -1,10 +1,13 @@
+// ============ 主题切换 ============
 const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
+// 改：把壁纸写到 <html> 的 CSS 变量上
 function setThemeBackground(imageUrl, isLightMode = false) {
-  document.body.style.transition = "background-image 0.5s ease";  // 添加渐变效果
-  document.body.style.backgroundImage = `url(${imageUrl})`;
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', isLightMode ? '#ffffff' : '#000000');
+  document.documentElement.style.setProperty('--bg-image', `url(${imageUrl})`);
+  // 透明主题色让状态栏背景不盖住壁纸
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) themeMeta.setAttribute('content', 'rgba(0,0,0,0)');
   document.body.classList.toggle('light', isLightMode);
 }
 
@@ -19,21 +22,18 @@ function toggleTheme() {
   }
 }
 
-// 初始化主题
+// 初始：跟随系统
 const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
 setThemeBackground(prefersLight ? 'assets/bg/day.jpeg' : 'assets/bg/night.jpeg', prefersLight);
 isLight = prefersLight;
 themeToggle.textContent = prefersLight ? '🌞' : '🌙';
-
 themeToggle.addEventListener('click', toggleTheme);
 
-// === 修正 iOS Safari 灵动岛高度丢失问题 ===
+// ============ 修正 iOS 视口高度丢失（给内容容器用） ============
 function fixViewportHeight() {
-  const vh = window.innerHeight * 0.01;
+  const vh = window.innerHeight * 0.01;            // 真实可视高度
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
-
-// 初始化 & 监听窗口变化
 fixViewportHeight();
 window.addEventListener('resize', fixViewportHeight);
 window.addEventListener('orientationchange', fixViewportHeight);
