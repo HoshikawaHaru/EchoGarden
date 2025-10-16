@@ -4,14 +4,14 @@ let isLight = false;
 
 // 改：把壁纸写到 <html> 的 CSS 变量上
 function setThemeBackground(imageUrl, isLightMode = false) {
-  const html = document.documentElement;
-  const body = document.body;
+  const bgLayer = document.getElementById('bg-layer');
   const meta = document.querySelector('meta[name="theme-color"]');
 
-  html.style.setProperty('--bg-image', `url(${imageUrl})`);
-  body.style.backgroundImage = `url(${imageUrl})`; // 兼容旧浏览器
+  if (bgLayer) {
+    bgLayer.src = imageUrl;  // ✅ 直接切换 <img> 的源文件
+  }
   if (meta) meta.setAttribute('content', 'rgba(0,0,0,0)');
-  body.classList.toggle('light', isLightMode);
+  document.body.classList.toggle('light', isLightMode);
 }
 
 function toggleTheme() {
