@@ -69,59 +69,6 @@ body.light #status-bar {
   backdrop-filter: blur(5px);
 }
 
-/* === 顶部状态栏（时间、电量区域） === */
-#status-bar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: env(safe-area-inset-top); /* iPhone 刘海高度 */
-  background: transparent; /* 让背景透到底层壁纸 */
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  pointer-events: none; /* 防止误触 */
-}
-
-/* 如果你希望浅色背景下自动变深文字，可加： */
-body.light #status-bar {
-  color: rgba(0, 0, 0, 0.8);
-}
-
-/* === 主屏 app 网格居中显示 === */
-#homescreen {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: env(safe-area-inset-top);
-  box-sizing: border-box;
-}
-
-.app-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-gap: 20px;
-  justify-content: center;
-}
-
-.app-icon {
-  text-align: center;
-  color: white;
-  user-select: none;
-}
-
-.app-icon img {
-  width: 64px;
-  height: 64px;
-  border-radius: 20%;
-  backdrop-filter: blur(5px);
-}
 
 /* === 主题切换按钮 === */
 #theme-toggle {
