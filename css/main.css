@@ -32,13 +32,13 @@ body{
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
 #homescreen{
-  min-height: calc(var(--vh) * 100);
+  /* 补上底部安全区高度，避免黑边 */
+  min-height: calc(var(--vh) * 100 + var(--safe-bottom));
   box-sizing: border-box;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
-
   display:flex;
   justify-content:center;
   align-items:center;
