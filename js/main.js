@@ -40,3 +40,28 @@ window.goHome = function() {
   appContainer.style.display = "none";
   home.style.display = "flex";
 };
+
+// === 主题切换逻辑 ===
+const themeToggle = document.getElementById('theme-toggle');
+let isLight = false;
+
+function setThemeBackground(imageUrl, themeColor = '#000000', isLightMode = false) {
+  document.body.style.backgroundImage = `url(${imageUrl})`;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
+  document.body.classList.toggle('light', isLightMode);
+}
+
+function toggleTheme() {
+  isLight = !isLight;
+  if (isLight) {
+    setThemeBackground('assets/bg/day.jpg', '#f4f4f4', true);
+    themeToggle.textContent = '🌞';
+  } else {
+    setThemeBackground('assets/bg/night.jpg', '#000000', false);
+    themeToggle.textContent = '🌙';
+  }
+}
+
+// 默认夜间主题
+setThemeBackground('assets/bg/night.jpg', '#000000', false);
+themeToggle.addEventListener('click', toggleTheme);
