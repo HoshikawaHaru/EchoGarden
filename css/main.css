@@ -1,88 +1,84 @@
-/* === 全屏背景设置 === */
+/* === 全屏背景设置 - 采用 100dvh 解决底部黑边和灵动岛覆盖问题 === */
 html, body {
   margin: 0;
-  padding: 0;
+  padding: 0; [cite_start]/* [cite: 4] */
   width: 100%;
-  height: 100%;
+  height: 100dvh; /* 💥 关键：使用动态视口高度，解决 iOS 底部黑边问题 */
+  min-height: -webkit-fill-available; /* 兼容性 fallback */
+  
+  /* 背景设置 */
   background: url('assets/bg/night.jpeg') no-repeat center center;
-  background-size: cover;     /* Background fills the screen */
+  background-size: cover;     [cite_start]/* 背景始终填满屏幕 [cite: 4] */
   background-position: center center;
-  background-attachment: scroll;  
-  background-color: #000;  /* Avoid white background during load */
+  background-attachment: scroll; [cite_start]/* [cite: 5] */
+  background-color: #000;  [cite_start]/* 避免加载时的白色背景 [cite: 5] */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  transition: background-image 0.5s ease, background-color 0.5s ease;
-
-  /* Ensure full viewport height, accounting for notches and safe areas */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  transition: background-image 0.5s ease, background-color 0.5s ease; [cite_start]/* [cite: 6] */
+  
+  /* 确保 body 容器本身不滚动，让内容容器滚动 */
+  overflow: hidden; 
 }
 
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: inherit;  /* Inherit the background from the body */
-  z-index: -1;  /* Ensure it's beneath all content */
-}
+/* 移除 body::after 伪元素，因为背景已在 body 上覆盖全屏 */
 
-/* Main screen layout */
+
+/* === 主屏网格 - 确保内容区域适配安全区 === */
 #homescreen {
-  display: flex;
+  display: flex; [cite_start]/* [cite: 7] */
   justify-content: center;
   align-items: center;
-  height: 100%;
-  box-sizing: border-box;
+  
+  /* 💥 关键：使用绝对定位确保占满 100dvh 的 body 容器 */
+  position: absolute;
+  inset: 0; /* 相当于 top:0; right:0; bottom:0; left:0; */
+  box-sizing: border-box; [cite_start]/* [cite: 7] */
   flex-direction: column;
-  padding-top: env(safe-area-inset-top);  /* Ensure top extends to dynamic island */
-  padding-bottom: env(safe-area-inset-bottom);  /* Adjust for bottom safe area */
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  overflow-y: auto; /* 允许内容在安全区域内滚动 */
+
+  /* 安全区域适配 - 确保内容不被刘海、灵动岛、底部横条遮挡 */
+  padding-top: env(safe-area-inset-top);  [cite_start]/* 确保顶部延伸到灵动岛区域 [cite: 7] */
+  padding-bottom: env(safe-area-inset-bottom);  [cite_start]/* 同样适配底部 [cite: 7] */
+  padding-left: env(safe-area-inset-left); [cite_start]/* [cite: 8] */
+  padding-right: env(safe-area-inset-right); [cite_start]/* [cite: 8] */
 }
 
+/* === 主屏 App 网格布局 === */
 .app-grid {
   display: grid;
-  grid-template-columns: repeat(4, 80px);
-  grid-gap: 24px 16px;
+  grid-template-columns: repeat(4, 80px); [cite_start]/* [cite: 10] */
+  grid-gap: 24px 16px; [cite_start]/* [cite: 10] */
   justify-content: center;
   align-content: center;
 }
 
-/* Icon styling */
 .app-icon {
   text-align: center;
   color: white;
-  user-select: none;
+  user-select: none; [cite_start]/* [cite: 11] */
 }
 
 .app-icon img {
-  width: 60px;
+  width: 60px; [cite_start]/* [cite: 34] */
   height: 60px;
   border-radius: 20%;
   backdrop-filter: blur(5px);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1); [cite_start]/* [cite: 12] */
 }
 
 .app-icon p {
-  font-size: 11px;
+  font-size: 11px; [cite_start]/* [cite: 13] */
   margin-top: 4px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5); [cite_start]/* [cite: 13] */
 }
-
 
 /* === 主题切换按钮 === */
 #theme-toggle {
   position: fixed;
-  top: calc(12px + env(safe-area-inset-top));
-  right: calc(12px + env(safe-area-inset-right));
+  top: calc(12px + env(safe-area-inset-top)); [cite_start]/* 适配灵动岛顶部 [cite: 13] */
+  right: calc(12px + env(safe-area-inset-right)); [cite_start]/* [cite: 14] */
   z-index: 100;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.25); [cite_start]/* [cite: 14] */
   color: white;
   border: none;
   border-radius: 50%;
@@ -90,29 +86,29 @@ body::after {
   height: 42px;
   font-size: 18px;
   backdrop-filter: blur(8px);
-  cursor: pointer;
+  cursor: pointer; [cite_start]/* [cite: 15] */
   transition: background 0.3s ease, transform 0.2s ease;
 }
-
 #theme-toggle:active {
   background: rgba(255, 255, 255, 0.35);
-  transform: scale(0.95);
+  transform: scale(0.95); [cite_start]/* [cite: 16] */
 }
-
 body.light #theme-toggle {
   background: rgba(0, 0, 0, 0.1);
-  color: black;
+  color: black; [cite_start]/* [cite: 17] */
 }
 
 /* === App 页面容器 === */
 #app-container {
-  position: fixed;
-  inset: 0;
+  position: fixed; [cite_start]/* 保持固定，覆盖主屏 [cite: 18] */
+  inset: 0; [cite_start]/* [cite: 41] */
   display: none;
   background: rgba(0, 0, 0, 0.9);
-  overflow-y: auto;
+  overflow-y: auto; [cite_start]/* 允许滚动 [cite: 18] */
+  
+  /* 安全区域内边距 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left); [cite_start]/* [cite: 43] */
+  padding-right: env(safe-area-inset-right); [cite_start]/* [cite: 43] */
 }
