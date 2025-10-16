@@ -1,8 +1,8 @@
-html{
+html {
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
-  background-size: cover;
-  background-position: center center;
-  background-attachment: scroll;
+  background-size: 100% auto;            /* 强制按屏幕宽度铺满 */
+  background-position: center top;       /* 贴顶避免下方被拉伸 */
+  background-repeat: no-repeat;
   background-color: #000;
 }
 
