@@ -19,7 +19,64 @@
 <body>
   <img id="bg-layer" src="assets/bg/night.jpeg" alt="background">
   <button id="theme-toggle" aria-label="切换主题">🌗</button>
+  
+<!-- === 顶部信息组件 === -->
+<div id="widget">
+  <div class="battery">Battery <span id="battery-level">--%</span></div>
+  <div class="info">
+    <span id="custom-text">Daily🤍</span>
+    <span id="date"></span> · <span id="weekday"></span>
+    <span id="time"></span>
+  </div>
+</div>
 
+<style>
+#widget {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 12px 20px;
+  color: white;
+  font-family: "SF Pro Display", sans-serif;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+#widget .battery {
+  font-size: 12px;
+  opacity: 0.8;
+}
+#widget .info {
+  font-size: 14px;
+  margin-top: 4px;
+}
+</style>
+
+<script>
+function updateWidget() {
+  const now = new Date();
+  const date = `${now.getMonth()+1}月 ${now.getDate()}`;
+  const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][now.getDay()];
+  const time = now.toTimeString().slice(0,5);
+  document.getElementById("date").textContent = date;
+  document.getElementById("weekday").textContent = weekday;
+  document.getElementById("time").textContent = time;
+}
+updateWidget();
+setInterval(updateWidget, 60000);
+
+navigator.getBattery && navigator.getBattery().then(b => {
+  const updateBattery = () => {
+    document.getElementById("battery-level").textContent = `${Math.round(b.level*100)}%`;
+  };
+  updateBattery();
+  b.addEventListener('levelchange', updateBattery);
+});
+</script>
+  
   <!-- 主屏 -->
   <main id="homescreen">
     <div class="app-grid">
@@ -36,3 +93,4 @@
   <section id="app-container" style="display:none;"></section>
 </body>
 </html>
+
