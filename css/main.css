@@ -5,19 +5,19 @@ html {
   background-repeat: no-repeat;
   background-color: #000;
 }
-/* === 背景层：不再依赖 html 背景 === */
+
+/* === 背景图像层（使用 <img> 避免 Safari 背景缩放错误） === */
 #bg-layer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;      /* 填满视口 */
-  background-color: black;
+  object-fit: cover;               /* ✅ 自动等比例填满视口，不放大裁切 */
+  object-position: center center;
   z-index: -1;
+  pointer-events: none;            /* 不影响交互 */
+  user-select: none;
 }
 
 /* ========= 视口与安全区变量 ========= */
