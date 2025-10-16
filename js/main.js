@@ -1,14 +1,50 @@
+// ============ 修复 iOS 视口高度和黑边问题 ============
+function fixViewportHeight() {
+  // 获取真实的视口高度（包括底部导航栏区域）
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+  
+  // 直接设置元素高度，不使用 CSS 变量
+  document.documentElement.style.height = `${vh}px`;
+  document.body.style.height = `${vh}px`;
+  
+  const homescreen = document.getElementById('homescreen');
+  if (homescreen) {
+    homescreen.style.height = `${vh}px`;
+  }
+  
+  const bgLayer = document.getElementById('bg-layer');
+  if (bgLayer) {
+    bgLayer.style.height = `${vh}px`;
+    bgLayer.style.width = `${vw}px`;
+  }
+}
+
+// 页面加载时立即执行
+fixViewportHeight();
+
+// 监听各种可能改变视口的事件
+window.addEventListener('resize', fixViewportHeight);
+window.addEventListener('orientationchange', () => {
+  setTimeout(fixViewportHeight, 100); // 延迟执行，等待旋转完成
+});
+
+// iOS Safari 特殊处理：滚动时重新计算
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', fixViewportHeight);
+  window.visualViewport.addEventListener('scroll', fixViewportHeight);
+}
+
 // ============ 主题切换 ============
 const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
-// 改：把壁纸写到 <html> 的 CSS 变量上
 function setThemeBackground(imageUrl, isLightMode = false) {
   const bgLayer = document.getElementById('bg-layer');
   const meta = document.querySelector('meta[name="theme-color"]');
 
   if (bgLayer) {
-    bgLayer.src = imageUrl;  // ✅ 直接切换 <img> 的源文件
+    bgLayer.src = imageUrl;
   }
   if (meta) meta.setAttribute('content', 'rgba(0,0,0,0)');
   document.body.classList.toggle('light', isLightMode);
@@ -32,13 +68,11 @@ isLight = prefersLight;
 themeToggle.textContent = prefersLight ? '🌞' : '🌙';
 themeToggle.addEventListener('click', toggleTheme);
 
-// ============ 修正 iOS 视口高度丢失（给内容容器用） ============
-function fixViewportHeight() {
-  // 计算真实视窗高度（包含安全区）
-  const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-
-fixViewportHeight();
-window.addEventListener('resize', fixViewportHeight);
-window.addEventListener('orientationchange', fixViewportHeight);
+// ============ App 点击事件（示例） ============
+document.querySelectorAll('.app-icon').forEach(icon => {
+  icon.addEventListener('click', function() {
+    const appName = this.dataset.app;
+    console.log('打开应用:', appName);
+    // 这里可以添加打开应用的逻辑
+  });
+});
