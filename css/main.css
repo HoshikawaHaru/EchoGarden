@@ -1,9 +1,23 @@
 html {
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
-  background-size: 100% auto;            /* 强制按屏幕宽度铺满 */
-  background-position: center top;       /* 贴顶避免下方被拉伸 */
+  background-size: 100% auto;            
+  background-position: center top;      
   background-repeat: no-repeat;
   background-color: #000;
+}
+/* === 背景层：不再依赖 html 背景 === */
+#bg-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;      /* 填满视口 */
+  background-color: black;
+  z-index: -1;
 }
 
 /* ========= 视口与安全区变量 ========= */
@@ -19,30 +33,30 @@ html {
 }
 
 /* ========= 把背景画在 html（根节点）上！覆盖到灵动岛 ========= */
-html {
+/*html {
   margin: 0;
   padding: 0;
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
   background-repeat: no-repeat;
-  background-size: 100% auto;          /* ✅ 以宽度为基准，防止放大 */
-  background-position: center top;     /* ✅ 贴顶避免上移 */
+  background-size: 100% auto;       
+  background-position: center top;  
   background-color: #000;
-}
+}*/
 
 /* === 底部补偿层：用于填满Safari底部黑条 === */
-html::after {
+/*html::after {
   content: "";
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: env(safe-area-inset-bottom, 20px);  /* ✅ 根据安全区自适应 */
+  height: env(safe-area-inset-bottom, 20px);  /* 
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center bottom;
   z-index: -1;
-}
+}*/
 
 /* body 不再承担背景，只负责布局 */
 body{
