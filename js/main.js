@@ -1,4 +1,4 @@
-// 页面切换逻辑
+// 页面切换
 const home = document.getElementById("homescreen");
 const appContainer = document.getElementById("app-container");
 
@@ -10,8 +10,7 @@ document.querySelectorAll(".app-icon").forEach(icon => {
     appContainer.innerHTML = `<p style="text-align:center;margin-top:30vh;">加载中...</p>`;
     try {
       const res = await fetch(`apps/${app}.html`);
-      const html = await res.text();
-      appContainer.innerHTML = html;
+      appContainer.innerHTML = await res.text();
     } catch {
       appContainer.innerHTML = `<p>❌ 无法加载 ${app}.html</p>`;
     }
@@ -29,14 +28,8 @@ const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
 function setThemeBackground(imageUrl, isLightMode = false) {
-  // 设置壁纸
   document.body.style.backgroundImage = `url(${imageUrl})`;
-
-  // 状态栏透明化
-  const themeMeta = document.querySelector('meta[name="theme-color"]');
-  themeMeta.setAttribute('content', 'rgba(0,0,0,0)');
-
-  // 切换浅/深模式
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', 'rgba(0,0,0,0)');
   document.body.classList.toggle('light', isLightMode);
 }
 
@@ -51,16 +44,10 @@ function toggleTheme() {
   }
 }
 
-// 默认夜间主题
-setThemeBackground('assets/bg/night.jpeg', false);
+// 默认主题根据系统外观自动匹配
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+setThemeBackground(prefersLight ? 'assets/bg/day.jpeg' : 'assets/bg/night.jpeg', prefersLight);
+isLight = prefersLight;
+themeToggle.textContent = prefersLight ? '🌞' : '🌙';
+
 themeToggle.addEventListener('click', toggleTheme);
-
-// 修复 iOS 视口高度问题
-function setViewportHeight() {
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-
-setViewportHeight();
-window.addEventListener('resize', setViewportHeight);
-window.addEventListener('orientationchange', setViewportHeight);
