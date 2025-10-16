@@ -1,78 +1,145 @@
-// ============ 修复 iOS 视口高度和黑边问题 ============
-function fixViewportHeight() {
-  // 获取真实的视口高度（包括底部导航栏区域）
-  const vh = window.innerHeight;
-  const vw = window.innerWidth;
-  
-  // 直接设置元素高度，不使用 CSS 变量
-  document.documentElement.style.height = `${vh}px`;
-  document.body.style.height = `${vh}px`;
-  
-  const homescreen = document.getElementById('homescreen');
-  if (homescreen) {
-    homescreen.style.height = `${vh}px`;
-  }
-  
-  const bgLayer = document.getElementById('bg-layer');
-  if (bgLayer) {
-    bgLayer.style.height = `${vh}px`;
-    bgLayer.style.width = `${vw}px`;
-  }
+/* ========= 视口与安全区变量 ========= */
+:root{
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
-// 页面加载时立即执行
-fixViewportHeight();
-
-// 监听各种可能改变视口的事件
-window.addEventListener('resize', fixViewportHeight);
-window.addEventListener('orientationchange', () => {
-  setTimeout(fixViewportHeight, 100); // 延迟执行，等待旋转完成
-});
-
-// iOS Safari 特殊处理：滚动时重新计算
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', fixViewportHeight);
-  window.visualViewport.addEventListener('scroll', fixViewportHeight);
+/* ========= 全屏背景处理 ========= */
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* JS 会动态设置精确高度 */
+  background-color: #000;
+  overflow: hidden;
 }
 
-// ============ 主题切换 ============
-const themeToggle = document.getElementById('theme-toggle');
-let isLight = false;
-
-function setThemeBackground(imageUrl, isLightMode = false) {
-  const bgLayer = document.getElementById('bg-layer');
-  const meta = document.querySelector('meta[name="theme-color"]');
-
-  if (bgLayer) {
-    bgLayer.src = imageUrl;
-  }
-  if (meta) meta.setAttribute('content', 'rgba(0,0,0,0)');
-  document.body.classList.toggle('light', isLightMode);
+/* === 背景图像层（使用 <img> 避免 Safari 背景缩放问题） === */
+#bg-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%; /* JS 会动态设置精确宽度 */
+  height: 100%; /* JS 会动态设置精确高度 */
+  object-fit: cover;
+  object-position: center center;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
 }
 
-function toggleTheme() {
-  isLight = !isLight;
-  if (isLight) {
-    setThemeBackground('assets/bg/day.jpeg', true);
-    themeToggle.textContent = '🌞';
-  } else {
-    setThemeBackground('assets/bg/night.jpeg', false);
-    themeToggle.textContent = '🌙';
-  }
+/* body 固定全屏，防止滚动和黑边 */
+body{
+  margin: 0; 
+  padding: 0;
+  width: 100%;
+  height: 100%; /* JS 会动态设置精确高度 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-// 初始：跟随系统
-const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-setThemeBackground(prefersLight ? 'assets/bg/day.jpeg' : 'assets/bg/night.jpeg', prefersLight);
-isLight = prefersLight;
-themeToggle.textContent = prefersLight ? '🌞' : '🌙';
-themeToggle.addEventListener('click', toggleTheme);
+/* ========= 主屏容器：精确填满视口 ========= */
+#homescreen{
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  padding-top: max(env(safe-area-inset-top, 0px), 20px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+  padding-left: max(env(safe-area-inset-left, 0px), 16px);
+  padding-right: max(env(safe-area-inset-right, 0px), 16px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
-// ============ App 点击事件（示例） ============
-document.querySelectorAll('.app-icon').forEach(icon => {
-  icon.addEventListener('click', function() {
-    const appName = this.dataset.app;
-    console.log('打开应用:', appName);
-    // 这里可以添加打开应用的逻辑
-  });
-});
+/* ========= App 网格 ========= */
+.app-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  gap: 24px 16px;
+  justify-content: center;
+  align-content: center;
+}
+
+.app-icon{
+  text-align: center;
+  color: #fff;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.app-icon:active{
+  transform: scale(0.95);
+}
+
+.app-icon img{
+  width: 60px; 
+  height: 60px;
+  border-radius: 20%;
+  backdrop-filter: blur(5px);
+  background: rgba(255,255,255,0.1);
+  display: block;
+  margin: 0 auto;
+}
+
+.app-icon p{
+  font-size: 11px; 
+  margin: 4px 0 0 0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* ========= 主题切换按钮 ========= */
+#theme-toggle{
+  position: fixed;
+  top: max(12px, var(--safe-top));
+  right: max(12px, var(--safe-right));
+  z-index: 10;
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  border: none; 
+  border-radius: 50%;
+  width: 42px; 
+  height: 42px; 
+  font-size: 18px;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#theme-toggle:active{ 
+  background: rgba(255,255,255,0.35); 
+  transform: scale(0.95); 
+}
+
+body.light #theme-toggle{ 
+  background: rgba(0,0,0,0.1); 
+  color: #000; 
+}
+
+/* ========= App 页面容器 ========= */
+#app-container{
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: rgba(0,0,0,0.9);
+  overflow-y: auto;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  z-index: 100;
+}
