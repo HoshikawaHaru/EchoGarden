@@ -27,13 +27,12 @@ document.querySelectorAll(".app-icon").forEach(icon => {
   });
 });
 
-//JS 动态主题切换
-function setThemeBackground(imageUrl, themeColor = '#000000', isLight = false) {
+// JS 动态主题切换
+function setThemeBackground(imageUrl, themeColor = '#000000', isLightMode = false) {
   document.body.style.backgroundImage = `url(${imageUrl})`;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
-  document.body.classList.toggle('light', isLight);
+  document.body.classList.toggle('light', isLightMode);
 }
-
 
 window.goHome = function() {
   appContainer.innerHTML = "";
@@ -45,21 +44,15 @@ window.goHome = function() {
 const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
-function setThemeBackground(imageUrl, themeColor = '#000000', isLightMode = false) {
-  document.body.style.backgroundImage = `url(${imageUrl})`;
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
-  document.body.classList.toggle('light', isLightMode);
-}
-
 function toggleTheme() {
   isLight = !isLight;
   if (isLight) {
-  setThemeBackground('/EchoGarden/assets/bg/day.jpeg', '#f4f4f4', true);
-  themeToggle.textContent = '🌞';
-} else {
-  setThemeBackground('/EchoGarden/assets/bg/night.jpeg', '#000000', false);
-  themeToggle.textContent = '🌙';
-}
+    setThemeBackground('/EchoGarden/assets/bg/day.jpeg', '#f4f4f4', true);
+    themeToggle.textContent = '🌞';
+  } else {
+    setThemeBackground('/EchoGarden/assets/bg/night.jpeg', '#000000', false);
+    themeToggle.textContent = '🌙';
+  }
 }
 
 // 默认夜间主题
