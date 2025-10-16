@@ -1,9 +1,12 @@
 /* === 全屏背景统一方案 === */
+:root {
+  --vh: 100%; /* JS 会在运行时重写 */
+}
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100dvh; /* 使用 dvh 适配屏幕可视高度 */
+  height: calc(var(--vh) * 100);
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;
