@@ -4,15 +4,16 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
+  background: url('/EchoGarden/assets/bg/night.jpeg') no-repeat center center fixed; /* 替换为实际路径 */
   background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  background-attachment: scroll;
   background-repeat: no-repeat;
-  transition: background-image 0.5s ease, background-color 0.5s ease;
   overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 
   /* 让背景从状态栏开始延伸 */
-  padding-top: env(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top); /* 适配刘海屏 */
+  transition: background-image 0.5s ease, background-color 0.5s ease; /* 背景切换平滑 */
 }
 
 /* === 顶部状态栏（时间、电量区域） === */
