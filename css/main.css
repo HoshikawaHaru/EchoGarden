@@ -12,9 +12,6 @@ html, body {
   transition: background-image 0.5s ease, background-color 0.5s ease;
 }
 
-
-
-
 /* === 主屏 app 网格 === */
 #homescreen {
   display: flex;
@@ -22,14 +19,14 @@ html, body {
   align-items: center;
   height: 100%;
   box-sizing: border-box;
+  padding-top: calc(env(safe-area-inset-top) + 6vh);/* 👈 可选微调（让不同屏幕比例都居中） */
 
   /* 安全区适配 */
-  padding-top: max(env(safe-area-inset-top), 20px);
-  padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
-
 
 .app-grid {
   display: grid;
@@ -37,7 +34,6 @@ html, body {
   grid-gap: 24px 16px;
   justify-content: center;
   align-content: center;
-  height: 100%;
 }
 
 
