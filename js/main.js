@@ -54,3 +54,12 @@ function toggleTheme() {
 // 默认夜间主题
 setThemeBackground('assets/bg/night.jpeg', false);
 themeToggle.addEventListener('click', toggleTheme);
+
+// 修复 iOS 视口高度问题
+function setViewportHeight() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
