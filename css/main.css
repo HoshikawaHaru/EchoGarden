@@ -1,16 +1,26 @@
 /* === 全屏背景设置 === */
 html, body {
-  margin: 0;
-  padding: 0;
-  height: calc(var(--vh, 1vh) * 100); /* 👈 JS动态计算，正确处理移动端视口 */
-  width: 100%;
-  background: url('assets/bg/night.jpeg') no-repeat center center;
-  background-size: cover;
-  background-attachment: fixed; /* 👈 建议改为 fixed，让背景图不会随任何意外滚动而移动 */
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  transition: background-image 0.5s ease, background-color 0.5s ease;
-  overflow: hidden; /* 👈 防止整个页面被意外滚动 */
+  margin: 0;
+  padding: 0;
+  height: calc(var(--vh, 1vh) * 100);  /* 👈 替换原来的 height: 100vh; 和 height: 100dvh; */
+  width: 100%;
+  background: url('assets/bg/night.jpeg') no-repeat center center;
+  background-size: cover;
+  background-attachment: scroll;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  transition: background-image 0.5s ease, background-color 0.5s ease;
+  overflow: hidden;
+
+  /* 让背景固定全屏 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+
 
 /* === 主屏 app 网格 === */
 #homescreen {
@@ -24,7 +34,7 @@ html, body {
   align-items: center;
   box-sizing: border-box;
   overflow: hidden;
-  
+
   /* 安全区域适配 */
   padding-top: max(env(safe-area-inset-top), 20px);  /* 👈 至少留20px */
   padding-bottom: max(env(safe-area-inset-bottom), 20px);
@@ -98,7 +108,7 @@ body.light #theme-toggle {
   display: none;
   background: rgba(0, 0, 0, 0.9);  /* 👈 加个背景色 */
   overflow-y: auto;  /* 👈 允许滚动 */
-  
+
   /* 安全区域内边距 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
