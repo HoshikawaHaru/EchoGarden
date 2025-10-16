@@ -29,9 +29,21 @@ document.querySelectorAll(".app-icon").forEach(icon => {
 
 // JS 动态主题切换
 function setThemeBackground(imageUrl, themeColor = '#000000', isLightMode = false) {
+  // 设置背景图片
   document.body.style.backgroundImage = `url(${imageUrl})`;
+
+  // 更新 <meta name="theme-color">，确保状态栏透明
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', 'rgba(0,0,0,0)'); // 新增这一行
+
+  // 更新页面背景颜色和亮度模式
   document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
+  
+  // 切换页面模式（浅色 / 深色）
   document.body.classList.toggle('light', isLightMode);
+
+  // 更新 iOS 状态栏样式
+  const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  statusMeta.setAttribute('content', isLightMode ? 'default' : 'black-translucent');
 }
 
 window.goHome = function() {
