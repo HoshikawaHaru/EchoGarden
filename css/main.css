@@ -2,17 +2,18 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  height: 100dvh;  /*动态视口高度 */
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;  /* 动态视口高度 */
+  min-height: -webkit-fill-available; /* iOS Safari 专用 */
   width: 100%;
-  background: url('assets/bg/night.jpeg') no-repeat center center fixed;
+  background: url('assets/bg/night.jpeg') no-repeat center center;
   background-size: cover;
-  background-attachment: fixed;  /* 👈 改成 fixed（或者保持，这行本来就有） */
-  background-repeat: no-repeat;
+  background-attachment: scroll;  /* 👈 iOS 上 fixed 有时会有问题，改回 scroll */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
-  overflow: hidden;  /*防止滚动 */
+  overflow: hidden;
   
   /* 让背景固定全屏 */
   position: fixed;
@@ -33,20 +34,21 @@ html, body {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  overflow: hidden;  /* 👈 加这行 */
+  overflow: hidden;
   
-  /* 👇 安全区域适配 */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* 安全区域适配 */
+  padding-top: max(env(safe-area-inset-top), 20px);  /* 👈 至少留20px */
+  padding-bottom: max(env(safe-area-inset-bottom), 20px);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
 
 .app-grid {
   display: grid;
-  grid-template-columns: repeat(4, 80px);  /*改成 4 列 */
-  grid-gap: 24px 16px;  /*调整间距 */
+  grid-template-columns: repeat(4, 80px);
+  grid-gap: 24px 16px;
   justify-content: center;
+  align-content: center;  /* 👈 加这行，确保垂直居中 */
 }
 
 .app-icon {
@@ -56,10 +58,17 @@ html, body {
 }
 
 .app-icon img {
-  width: 64px;
-  height: 64px;
+  width: 60px;  /* 👈 改小一点，适配4列 */
+  height: 60px;
   border-radius: 20%;
   backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.1);  /* 👈 加个半透明背景 */
+}
+
+.app-icon p {
+  font-size: 11px;  /* 👈 加这个，文字大小 */
+  margin-top: 4px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 /* === 主题切换按钮 === */
@@ -80,9 +89,9 @@ html, body {
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-#theme-toggle:hover {
+#theme-toggle:active {  /* 👈 改成 :active，移动端没有 hover */
   background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.05);
+  transform: scale(0.95);
 }
 
 /* 浅色模式下反色 */
@@ -90,6 +99,7 @@ body.light #theme-toggle {
   background: rgba(0, 0, 0, 0.1);
   color: black;
 }
+
 #app-container {
   position: fixed;
   top: 0;
@@ -97,8 +107,10 @@ body.light #theme-toggle {
   right: 0;
   bottom: 0;
   display: none;
+  background: rgba(0, 0, 0, 0.9);  /* 👈 加个背景色 */
+  overflow-y: auto;  /* 👈 允许滚动 */
   
-  /* 👇 加上安全区域内边距 */
+  /* 安全区域内边距 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
