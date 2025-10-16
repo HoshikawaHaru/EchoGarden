@@ -4,39 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <!-- 🍎 iOS 独有设置：全屏显示 + 状态栏样式 -->
+  <!-- 🍎 iOS 全屏设置 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="rgba(0,0,0,0)">
 
-  <!-- 🌈 浏览器主题色，动态可变 -->
-  <meta name="theme-color" content="#dcd6f7">
-
   <!-- 页面标题 -->
   <title>EchoGarden</title>
 
-  <!-- 🍃 样式 -->
+  <!-- 样式 -->
   <link rel="stylesheet" href="css/main.css">
 
-  <!-- 🍎 桌面/启动图标，可统一引用一张512px PNG -->
+  <!-- 图标 -->
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
   <link rel="icon" href="assets/icons/icon512.png" type="image/png">
 
-  <!-- 🔧 动态主题管理 -->
-  <script src="js/themeManager.js" defer></script>
+  <!-- 脚本 -->
   <script src="js/main.js" defer></script>
 </head>
 
 <body>
-  <!-- 顶部状态栏 -->
-  <header id="status-bar">
-    <div id="time"></div>
-    <div id="status-icons">📶 🔋</div>
-  </header>
-  
   <!-- 主题切换按钮 -->
-<button id="theme-toggle" aria-label="切换主题">🌗</button>
-
+  <button id="theme-toggle" aria-label="切换主题">🌗</button>
 
   <!-- 主屏 -->
   <main id="homescreen">
@@ -74,11 +63,5 @@
 
   <!-- 动态加载 app 的容器 -->
   <section id="app-container" style="display:none;"></section>
-
-  <!-- JS -->
-  <script src="js/main.js" defer></script>
 </body>
 </html>
-
-
-
