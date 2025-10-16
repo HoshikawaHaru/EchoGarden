@@ -19,7 +19,7 @@ html, body {
   align-items: center;
   height: 100%;
   box-sizing: border-box;
-  /*padding-top: calc(env(safe-area-inset-top) + 6vh); 👈 可选微调（让不同屏幕比例都居中） */
+  padding-top: calc(env(safe-area-inset-top) + 6vh); /*👈 可选微调（让不同屏幕比例都居中） */
 
   /* 安全区适配 */
   padding-top: env(safe-area-inset-top);
