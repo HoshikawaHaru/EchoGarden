@@ -20,154 +20,113 @@
   <img id="bg-layer" src="assets/bg/night.jpeg" alt="background">
   <button id="theme-toggle" aria-label="切换主题">🌗</button>
   
-<!-- === 信息组件（柔光液态玻璃） === -->
-<div id="info-widget">
-  <div class="top-panel">
-    <div class="battery-box">
-      <div class="battery-text">Battery <span id="battery-level">--%</span></div>
-      <svg class="battery-circle" width="36" height="36" viewBox="0 0 36 36">
-        <circle class="bg" cx="18" cy="18" r="16" />
-        <circle class="progress" cx="18" cy="18" r="16" />
-      </svg>
-    </div>
+<!-- === 顶部信息组件（电量条 + 圆形进度） === -->
+<div class="top-panel">
+  <!-- 左侧圆形进度环 -->
+  <div class="battery-circle-box">
+    <svg class="battery-circle" width="56" height="56" viewBox="0 0 56 56">
+      <circle class="bg" cx="28" cy="28" r="24" />
+      <circle class="progress" cx="28" cy="28" r="24" />
+    </svg>
+    <span id="battery-text">--%</span>
   </div>
 
-  <div class="bottom-panel">
-    <div class="left">
-      <img id="profile-img" src="assets/icons/sample.png" alt="icon" />
+  <!-- 右侧电量条 -->
+  <div class="battery-bar-box">
+    <div class="battery-bar">
+      <div class="battery-fill" id="battery-fill"></div>
     </div>
-    <div class="center">
-      <p id="custom-text">Daily🤍 ✧˚⋆</p>
-      <p id="date-line"><span id="date"></span> · <span id="weekday"></span></p>
-    </div>
-    <div class="right">
-      <p id="time">--:--</p>
-    </div>
+    <div class="battery-label">Battery</div>
   </div>
 </div>
 
 <style>
-/* === 外层容器 === */
-#info-widget {
-  position: absolute;
-  top: 140px;
-  left: 50%;
-  transform: translateX(-50%);
+.top-panel {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 340px;
-  padding: 16px 20px;
-  border-radius: 30px;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(15px) saturate(150%);
-  box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-  color: #fff;
-  font-family: "SF Pro Display", "PingFang SC", sans-serif;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.2);
+  border-radius: 22px;
+  padding: 10px 16px;
 }
 
-/* === 上部：电量条 + 圆形进度 === */
-.top-panel {
+/* 左：圆形进度环 */
+.battery-circle-box {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 20px;
-  padding: 6px 14px;
-}
-.battery-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.battery-text {
-  font-size: 13px;
-  letter-spacing: 0.3px;
-  opacity: 0.9;
 }
 .battery-circle {
   transform: rotate(-90deg);
 }
 .battery-circle .bg {
   fill: none;
-  stroke: rgba(255,255,255,0.2);
-  stroke-width: 3;
+  stroke: rgba(255,255,255,0.25);
+  stroke-width: 4;
 }
 .battery-circle .progress {
   fill: none;
   stroke: #fff;
-  stroke-width: 3;
+  stroke-width: 4;
   stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
+  stroke-dasharray: 150;
+  stroke-dashoffset: 150;
   transition: stroke-dashoffset 0.5s ease;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.4));
+}
+#battery-text {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 0 4px rgba(255,255,255,0.4);
 }
 
-/* === 下部：圆角信息栏 === */
-.bottom-panel {
+/* 右：横条电量条 */
+.battery-bar-box {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255,255,255,0.15);
-  border-radius: 25px;
-  padding: 10px 16px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 }
-.bottom-panel img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.3);
-  box-shadow: 0 0 8px rgba(255,255,255,0.2);
+.battery-bar {
+  width: 140px;
+  height: 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.25);
+  overflow: hidden;
+  position: relative;
 }
-.center {
-  text-align: left;
-  flex: 1;
-  margin-left: 10px;
+.battery-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #a3d9ff, #ffffff);
+  border-radius: 8px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 6px rgba(255,255,255,0.4);
 }
-#custom-text {
-  font-size: 15px;
-  font-weight: 500;
-}
-#date-line {
+.battery-label {
   font-size: 13px;
-  opacity: 0.85;
-  margin-top: 3px;
-}
-.right #time {
-  font-size: 22px;
-  font-weight: 600;
+  opacity: 0.8;
+  color: #fff;
 }
 </style>
 
 <script>
-function updateWidget() {
-  const now = new Date();
-  const date = `${now.getMonth()+1}月 ${now.getDate()}`;
-  const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][now.getDay()];
-  const time = now.toTimeString().slice(0,5);
-  document.getElementById("date").textContent = date;
-  document.getElementById("weekday").textContent = weekday;
-  document.getElementById("time").textContent = time;
-}
-updateWidget();
-setInterval(updateWidget, 60000);
-
-// 电量更新
-navigator.getBattery && navigator.getBattery().then(b => {
-  const updateBattery = () => {
-    const level = Math.round(b.level * 100);
-    document.getElementById("battery-level").textContent = `${level}%`;
+navigator.getBattery && navigator.getBattery().then(battery => {
+  function updateBattery() {
+    const level = Math.round(battery.level * 100);
     const circle = document.querySelector(".battery-circle .progress");
-    const offset = 100 - level;
+    const offset = 150 - (150 * level) / 100;
     circle.style.strokeDashoffset = offset;
-  };
+    document.getElementById("battery-text").textContent = `${level}%`;
+    document.getElementById("battery-fill").style.width = `${level}%`;
+  }
   updateBattery();
-  b.addEventListener("levelchange", updateBattery);
+  battery.addEventListener("levelchange", updateBattery);
 });
 </script>
-
   
   <!-- 主屏 -->
   <main id="homescreen">
@@ -185,5 +144,6 @@ navigator.getBattery && navigator.getBattery().then(b => {
   <section id="app-container" style="display:none;"></section>
 </body>
 </html>
+
 
 
