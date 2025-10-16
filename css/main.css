@@ -1,4 +1,4 @@
-/* === 通用全屏设置 === */
+/* === 全屏背景设置 === */
 html, body {
   margin: 0;
   padding: 0;
@@ -6,34 +6,33 @@ html, body {
   height: 100%;
   background: url('assets/bg/night.jpeg') no-repeat center center;
   background-size: cover;
-  background-attachment: scroll; /* ✅ 改回 scroll，防止iOS裁切 */
-  background-color: #000; /* ✅ 防止加载瞬间白屏 */
+  background-attachment: scroll;     /* ✅ 防止 iOS 裁切 */
+  background-color: #000;            /* ✅ 防止加载白闪 */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   transition: background-image 0.5s ease, background-color 0.5s ease;
+
+  /* ✅ 让背景延伸进底部安全区 */
+  background-origin: border-box;
+  background-clip: border-box;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* === 主屏容器 === */
+/* === 主屏网格 === */
 #homescreen {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
   flex-direction: column;
-
-  /* ✅ 安全区适配 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
 
-/* === App 网格 === */
 .app-grid {
   display: grid;
   grid-template-columns: repeat(4, 80px);
@@ -79,28 +78,22 @@ html, body {
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
 }
-
 #theme-toggle:active {
   background: rgba(255, 255, 255, 0.35);
   transform: scale(0.95);
 }
-
 body.light #theme-toggle {
   background: rgba(0, 0, 0, 0.1);
   color: black;
 }
 
-/* === app-container（应用页） === */
+/* === App 页面容器 === */
 #app-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   display: none;
   background: rgba(0, 0, 0, 0.9);
   overflow-y: auto;
-
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
