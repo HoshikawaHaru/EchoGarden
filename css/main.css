@@ -1,3 +1,11 @@
+html{
+  background-image: var(--bg-image, url('assets/bg/night.jpeg'));
+  background-size: cover;
+  background-position: center center;
+  background-attachment: scroll;
+  background-color: #000;
+}
+
 /* ========= 视口与安全区变量 ========= */
 :root{
   --vh: 1vh; /* 会被 JS 重写为 window.innerHeight*0.01px */
