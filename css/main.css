@@ -7,13 +7,13 @@
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
-html {
+/*html {
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
   background-size: 100% auto;            
   background-position: center top;      
   background-repeat: no-repeat;
   background-color: #000;
-}
+}*/
 
 /* === 背景图像层（使用 <img> 避免 Safari 背景缩放错误） === */
 #bg-layer {
@@ -29,20 +29,12 @@ html {
   user-select: none;
 }
 
-/* ========= 视口与安全区变量 ========= */
-:root{
-  --vh: 1vh; /* 会被 JS 重写为 window.innerHeight*0.01px */
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-
   /* 动态壁纸变量：JS 写入 url('...') */
   --bg-image: url('assets/bg/night.jpeg');
 }
 
 /* ========= 把背景画在 html（根节点）上！覆盖到灵动岛 ========= */
-/*html {
+html {
   margin: 0;
   padding: 0;
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
@@ -50,10 +42,10 @@ html {
   background-size: 100% auto;       
   background-position: center top;  
   background-color: #000;
-}*/
+}
 
 /* === 底部补偿层：用于填满Safari底部黑条 === */
-/*html::after {
+html::after {
   content: "";
   position: fixed;
   left: 0;
@@ -65,7 +57,7 @@ html {
   background-size: 100% auto;
   background-position: center bottom;
   z-index: -1;
-}*/
+}
 
 /* body 不再承担背景，只负责布局 */
 body{
