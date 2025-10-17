@@ -10,7 +10,7 @@
 <title>Echo Garden</title>
 
 <style>
-/* === 全屏背景 === */
+/* === 背景全屏覆盖 === */
 html, body {
   margin: 0;
   padding: 0;
@@ -19,11 +19,10 @@ html, body {
   overflow: hidden;
   background: url('assets/bg/night.jpeg') no-repeat center center fixed;
   background-size: cover;
-  -webkit-background-size: cover;
-  background-color: black; /* 防止底部白边 */
+  background-color: #000; /* 防止闪白 */
 }
 
-/* === 主容器：主屏 + 右滑页 === */
+/* === 主容器 === */
 #container {
   display: flex;
   width: 200%;
@@ -38,7 +37,7 @@ html, body {
   align-items: center;
 }
 
-/* === 主屏图标布局 === */
+/* === 图标区样式 === */
 .app-grid {
   display: grid;
   grid-template-columns: repeat(3, 90px);
@@ -47,29 +46,20 @@ html, body {
   align-items: center;
 }
 
+/* 保留原样式，不用毛玻璃，只是轻雾面 */
 .app {
-  position: relative;
   width: 90px;
   height: 90px;
   border-radius: 25px;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: rgba(255,255,255,0.9);
+  flex-direction: column;
+  color: rgba(255,255,255,0.95);
   font-size: 14px;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  z-index: 2;
-}
-
-.app img {
-  width: 45px;
-  height: 45px;
-  object-fit: contain;
-  margin-bottom: 5px;
-  pointer-events: none;
 }
 
 /* === 滑动动画 === */
@@ -77,10 +67,10 @@ html, body {
   transform: translateX(-50%);
 }
 
-/* === Dock 栏 === */
+/* === Dock 栏（唯一毛玻璃区域）=== */
 #dock {
   position: fixed;
-  bottom: calc(25px + env(safe-area-inset-bottom));
+  bottom: env(safe-area-inset-bottom, 0);
   left: 50%;
   transform: translateX(-50%);
   width: 200px;
@@ -91,8 +81,9 @@ html, body {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
   z-index: 100;
+  padding-bottom: calc(env(safe-area-inset-bottom) / 2);
 }
 
 .dock-item {
@@ -108,6 +99,11 @@ html, body {
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
   font-weight: 500;
 }
+
+/* 防止底部白条 */
+html {
+  background-color: #000;
+}
 </style>
 </head>
 
@@ -116,19 +112,17 @@ html, body {
     <!-- 首页 -->
     <section class="page" id="home">
       <div class="app-grid">
-        <div class="app"><img src="assets/icons/message.png" alt="消息"><span>消息</span></div>
-        <div class="app"><img src="assets/icons/diary.png" alt="日记"><span>日记</span></div>
-        <div class="app"><img src="assets/icons/forum.png" alt="论坛"><span>论坛</span></div>
-        <div class="app"><img src="assets/icons/words.png" alt="单词"><span>单词</span></div>
-        <div class="app"><img src="assets/icons/heart.png" alt="心声"><span>心声</span></div>
-        <div class="app"><img src="assets/icons/setting.png" alt="设置"><span>设置</span></div>
+        <div class="app">日记</div>
+        <div class="app">论坛</div>
+        <div class="app">单词</div>
+        <div class="app">心声</div>
       </div>
     </section>
 
     <!-- 右滑页（塔罗） -->
     <section class="page" id="right">
       <div class="app-grid">
-        <div class="app"><img src="assets/icons/tarot.png" alt="塔罗"><span>塔罗</span></div>
+        <div class="app">塔罗</div>
       </div>
     </section>
   </div>
