@@ -140,46 +140,63 @@ body.light #theme-toggle{ background: rgba(0,0,0,0.1); color:#000; }
 
 /* === 消息页 === */
 #message-page {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  padding-top: calc(env(safe-area-inset-top) + 10px); /* 顶部安全区 + 一点间距 */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 70px); /* 底部安全区 + tab 高度 */
+  box-sizing: border-box;
   background: rgba(255,255,255,0.4);
   backdrop-filter: blur(15px);
+  overflow: hidden;
 }
 
 /* 顶部栏 */
 .top-bar {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  height: 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 0 16px;
   background: rgba(255,255,255,0.3);
   backdrop-filter: blur(15px);
+  z-index: 10;
 }
 
-/* 底部tab */
-.bottom-tab {
-  display: flex;
-  justify-content: space-around;
-  background: rgba(255,255,255,0.3);
-  backdrop-filter: blur(15px);
-  padding: 10px 0;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-.tab {
-  display: none;
+/* tab 内容区域 */
+#tab-content {
   flex: 1;
   overflow-y: auto;
+  margin-top: calc(env(safe-area-inset-top) + 48px); /* 顶部栏高度 */
+  margin-bottom: calc(env(safe-area-inset-bottom) + 60px); /* 底部tab高度 */
   padding: 15px;
 }
 
-.tab.active {
-  display: block;
+/* 底部tab固定 */
+.bottom-tab {
+  position: fixed;
+  bottom: env(safe-area-inset-bottom);
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(255,255,255,0.3);
+  backdrop-filter: blur(15px);
+  z-index: 10;
 }
 
+.tab-btn {
+  font-size: 22px;
+  background: transparent;
+  border: none;
+}
 .tab-btn.active {
   transform: scale(1.1);
 }
