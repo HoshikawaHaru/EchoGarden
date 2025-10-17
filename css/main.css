@@ -66,6 +66,7 @@ body{
   color: #fff;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
