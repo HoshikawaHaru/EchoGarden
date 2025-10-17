@@ -3,16 +3,15 @@ const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
 // 改：把壁纸写到 <html> 的 CSS 变量上
-function fixViewportHeight() {
-  const viewport = window.visualViewport;
-  const vh = (viewport ? viewport.height : window.innerHeight) * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
+function setThemeBackground(imageUrl, isLightMode = false) {
+  const bgLayer = document.getElementById('bg-layer');
+  const meta = document.querySelector('meta[name="theme-color"]');
 
-  // 调整背景图层高度，确保背景图层和 #homescreen 高度一致
-  const bg = document.getElementById('bg-layer');
-  if (bg && viewport) {
-    bg.style.height = viewport.height + 'px';
+  if (bgLayer) {
+    bgLayer.src = imageUrl;  // ✅ 直接切换 <img> 的源文件
   }
+  if (meta) meta.setAttribute('content', 'rgba(0,0,0,0)');
+  document.body.classList.toggle('light', isLightMode);
 }
 
 function toggleTheme() {
@@ -35,16 +34,9 @@ themeToggle.addEventListener('click', toggleTheme);
 
 // ============ 修正 iOS 视口高度丢失（给内容容器用） ============
 function fixViewportHeight() {
-  // 使用 visualViewport.height 获取真实可见高度
-  const viewport = window.visualViewport;
-  const vh = (viewport ? viewport.height : window.innerHeight) * 0.01;
+  // 计算真实视窗高度（包含安全区）
+  const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
-
-  // 同步给背景层高度
-  const bg = document.getElementById('bg-layer');
-  if (bg && viewport) {
-    bg.style.height = viewport.height + 'px';
-  }
 }
 
 fixViewportHeight();
