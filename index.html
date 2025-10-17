@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="rgba(0,0,0,0)">
     <title>Echo Garden</title>
     <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
     <link rel="icon" href="assets/icons/icon512.png" type="image/png">
@@ -17,38 +16,40 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+        }
+
+        body {
             width: 100%;
             height: 100%;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             position: fixed;
-            background: transparent;
-        }
-        
-        html {
-            height: 100%;
-            height: -webkit-fill-available;
-        }
-        
-        body {
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
         }
 
         #bg-layer {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: -1;
+            z-index: 0;
         }
 
         #theme-toggle {
             position: fixed;
-            top: max(env(safe-area-inset-top), 20px);
+            top: 20px;
+            top: max(20px, env(safe-area-inset-top));
             right: 20px;
             width: 50px;
             height: 50px;
@@ -68,21 +69,24 @@
 
         /* 滑动容器 */
         #swipe-container {
-            width: 200vw;
-            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
             display: flex;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
+            z-index: 1;
         }
 
         .page {
-            width: 100vw;
-            height: 100vh;
+            width: 50%;
+            height: 100%;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-bottom: 120px;
+            padding-bottom: 140px;
         }
 
         /* App 网格布局 */
@@ -124,7 +128,7 @@
         /* Dock 栏样式 */
         #dock {
             position: fixed;
-            bottom: max(env(safe-area-inset-bottom), 20px);
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -137,6 +141,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.2);
             z-index: 1000;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
 
         #dock .app-icon {
@@ -157,7 +162,7 @@
         /* 页面指示器 */
         .page-indicators {
             position: fixed;
-            bottom: max(env(safe-area-inset-bottom, 20px) + 100px, 120px);
+            bottom: 120px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -181,6 +186,12 @@
 
         #app-container {
             display: none;
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            body {
+                height: -webkit-fill-available;
+            }
         }
     </style>
 </head>
@@ -252,7 +263,7 @@
 
         function updatePage(page) {
             currentPage = Math.max(0, Math.min(1, page));
-            swipeContainer.style.transform = `translateX(-${currentPage * 100}vw)`;
+            swipeContainer.style.transform = `translateX(-${currentPage * 50}%)`;
             
             indicators.forEach((ind, idx) => {
                 ind.classList.toggle('active', idx === currentPage);
@@ -269,8 +280,8 @@
             if (!isDragging) return;
             currentX = e.touches[0].clientX;
             const diff = currentX - startX;
-            const offset = -currentPage * 100 + (diff / window.innerWidth) * 100;
-            swipeContainer.style.transform = `translateX(${offset}vw)`;
+            const offset = -currentPage * 50 + (diff / window.innerWidth) * 50;
+            swipeContainer.style.transform = `translateX(${offset}%)`;
         });
 
         swipeContainer.addEventListener('touchend', (e) => {
@@ -303,12 +314,11 @@
             themeToggle.textContent = isDarkTheme ? '🌙' : '☀️';
         });
 
-        // App 点击事件（可以根据需要添加）
+        // App 点击事件
         document.querySelectorAll('.app-icon').forEach(icon => {
             icon.addEventListener('click', () => {
                 const appName = icon.dataset.app;
                 console.log('打开应用:', appName);
-                // 这里可以添加打开应用的逻辑
             });
         });
     </script>
