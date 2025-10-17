@@ -16,28 +16,28 @@
   <script src="js/main.js" defer></script>
 
   <style>
-  /* 给时间文字添加呼吸灯效果 */
-  @keyframes breathing {
-    0% {
-      color: #fff;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 255, 255, 0.6);
+    /* 给时间文字添加呼吸灯效果 */
+    @keyframes breathing {
+      0% {
+        color: #fff;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 255, 255, 0.6);
+      }
+      50% {
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.8);
+      }
+      100% {
+        color: #fff;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 255, 255, 0.6);
+      }
     }
-    50% {
-      color: rgba(255, 255, 255, 0.9);
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.8);
-    }
-    100% {
-      color: #fff;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 255, 255, 0.6);
-    }
-  }
 
-  #time {
-    font-size: 24px;
-    font-weight: 700;
-    animation: breathing 2s ease-in-out infinite; /* 每2秒循环一次 */
-  }
-</style>
+    #time {
+      font-size: 24px;
+      font-weight: 700;
+      animation: breathing 2s ease-in-out infinite; /* 每2秒循环一次 */
+    }
+  </style>
 
 </head>
 
@@ -166,25 +166,21 @@
 }
 </style>
 
-<script>
-function updateTime() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  document.getElementById("time").textContent = `${hours}:${minutes}`;
-  
-  // 刷新后，继续更新下一帧
-  requestAnimationFrame(updateTime);
-}
+<p id="time">--:--</p>
 
-// 页面加载时开始更新
-updateTime();
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById("time").textContent = `${hours}:${minutes}`;
+      
+      // 继续下一帧更新
+      requestAnimationFrame(updateTime);
+    }
 
-  document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) {
-    updateTime();  // 页面变为可见时，手动刷新一次
-  }
-});
+    // 页面加载时立即更新一次
+    updateTime(); 
 
 
 // 电量更新
@@ -235,6 +231,7 @@ navigator.getBattery && navigator.getBattery().then(b => {
 
 </body>
 </html>
+
 
 
 
