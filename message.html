@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>消息</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="message-page">
+    <header class="top-bar">
+      <button id="back-home">🏠</button>
+      <h1>消息</h1>
+      <button id="add-char">➕</button>
+    </header>
+
+    <main id="tab-content">
+      <section id="tab-chat" class="tab active">
+        <ul id="char-list">
+          <li class="char-item">
+            <img src="assets/avatar/qinche.png" class="avatar">
+            <div class="char-info">
+              <p class="char-name">Nash</p>
+              <p class="char-preview">“晚安，别太晚睡。”</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section id="tab-moments" class="tab">朋友圈内容（即将开放）</section>
+      <section id="tab-timer" class="tab">计时器内容（即将开放）</section>
+      <section id="tab-user" class="tab">我（上传头像、人设等）</section>
+    </main>
+
+    <nav class="bottom-tab">
+      <button class="tab-btn active" data-target="tab-chat">💬</button>
+      <button class="tab-btn" data-target="tab-moments">🌸</button>
+      <button class="tab-btn" data-target="tab-timer">⏰</button>
+      <button class="tab-btn" data-target="tab-user">👤</button>
+    </nav>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
