@@ -13,11 +13,9 @@ html {
   left: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;               /* ✅ 自动等比例填满视口，不放大裁切 */
+  object-fit: cover;
   object-position: center center;
-  z-index: -2;
-  pointer-events: none;            /* 不影响交互 */
-  user-select: none;
+  z-index: -2; /* ✅ 降低背景层级 */
 }
 
 /* ========= 视口与安全区变量 ========= */
@@ -31,32 +29,6 @@ html {
   /* 动态壁纸变量：JS 写入 url('...') */
   --bg-image: url('assets/bg/night.jpeg');
 }
-
-/* ========= 把背景画在 html（根节点）上！覆盖到灵动岛 ========= */
-/*html {
-  margin: 0;
-  padding: 0;
-  background-image: var(--bg-image, url('assets/bg/night.jpeg'));
-  background-repeat: no-repeat;
-  background-size: 100% auto;       
-  background-position: center top;  
-  background-color: #000;
-}*/
-
-/* === 底部补偿层：用于填满Safari底部黑条 === */
-/*html::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: env(safe-area-inset-bottom, 20px);  /* 
-  background-image: var(--bg-image, url('assets/bg/night.jpeg'));
-  background-repeat: no-repeat;
-  background-size: 100% auto;
-  background-position: center bottom;
-  z-index: -1;
-}*/
 
 /* body 不再承担背景，只负责布局 */
 body{
@@ -82,15 +54,27 @@ body{
   align-items:center;
   flex-direction:column;
 }
+/* === Widget 卡片 === */
+#widget-dock {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(env(safe-area-inset-top) + 120px);
+  width: min(88vw, 360px);
+  z-index: 10; /* ✅ 保持在上层 */
+}
 
-/* ========= App 网格 ========= */
-.app-grid{
-  display:grid;
+/* === 主屏图标区 === */
+.app-grid {
+  display: grid;
   grid-template-columns: repeat(4, 80px);
   grid-gap: 24px 16px;
   justify-content: center;
   align-content: center;
+  position: relative;
+  z-index: 5; /* ✅ 图标在Widget下但在背景上 */
 }
+
 
 .app-icon{
   text-align:center;
@@ -109,21 +93,12 @@ body{
 }
 
 /* ========= 主题切换按钮 ========= */
-#theme-toggle{
+#theme-toggle {
   position: fixed;
   top: calc(12px + var(--safe-top));
   right: calc(12px + var(--safe-right));
-  z-index: 10;
-  background: rgba(255,255,255,0.25);
-  color: #fff;
-  border:none; border-radius:50%;
-  width:42px; height:42px; font-size:18px;
-  backdrop-filter: blur(8px);
-  cursor:pointer;
-  transition: background .3s ease, transform .2s ease;
+  z-index: 20; /* ✅ 保证最顶层 */
 }
-#theme-toggle:active{ background: rgba(255,255,255,0.35); transform: scale(0.95); }
-body.light #theme-toggle{ background: rgba(0,0,0,0.1); color:#000; }
 
 /* ========= App 页面容器 ========= */
 #app-container{
