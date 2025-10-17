@@ -142,17 +142,18 @@
 </style>
 
 <script>
-function updateWidget() {
+function updateTime() {
   const now = new Date();
-  const date = `${now.getMonth()+1}月 ${now.getDate()}`;
-  const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][now.getDay()];
-  const time = now.toTimeString().slice(0,5);
-  document.getElementById("date").textContent = date;
-  document.getElementById("weekday").textContent = weekday;
-  document.getElementById("time").textContent = time;
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById("time").textContent = `${hours}:${minutes}`;
 }
-updateWidget();
-setInterval(updateWidget, 60000);
+
+// 页面加载立即更新一次
+updateTime();
+
+// 每分钟自动更新
+setInterval(updateTime, 60000);
 
 // 电量更新
 navigator.getBattery && navigator.getBattery().then(b => {
@@ -186,6 +187,7 @@ navigator.getBattery && navigator.getBattery().then(b => {
   <section id="app-container" style="display:none;"></section>
 </body>
 </html>
+
 
 
 
