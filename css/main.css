@@ -74,7 +74,7 @@ body{
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
 #homescreen {
-  min-height: calc(var(--vh) * 100); /* 确保屏幕高度动态计算 */
+  min-height: calc(var(--vh) * 100 + 20px); /* 调整额外的底部高度 */
   box-sizing: border-box;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
