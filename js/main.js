@@ -34,9 +34,16 @@ themeToggle.addEventListener('click', toggleTheme);
 
 // ============ 修正 iOS 视口高度丢失（给内容容器用） ============
 function fixViewportHeight() {
-  // 计算真实视窗高度（包含安全区）
-  const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
+  // 使用 visualViewport.height 获取真实可见高度
+  const viewport = window.visualViewport;
+  const vh = (viewport ? viewport.height : window.innerHeight) * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+  // 同步给背景层高度
+  const bg = document.getElementById('bg-layer');
+  if (bg && viewport) {
+    bg.style.height = viewport.height + 'px';
+  }
 }
 
 fixViewportHeight();
