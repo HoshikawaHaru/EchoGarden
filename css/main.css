@@ -66,6 +66,10 @@ body{
   color: #fff;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
+  background: transparent !important;
+  /* 其他样式保持不变 */
+}
+
 }
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
