@@ -4,144 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- 🍎 iOS 全屏与状态栏 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="rgba(0,0,0,0)">
   <title>Echo Garden</title>
 
+  <link rel="stylesheet" href="css/main.css"><!-- 保留你之前成功的样式 -->
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
   <link rel="icon" href="assets/icons/icon512.png" type="image/png">
+  <script src="js/main.js" defer></script>
 
+  <!-- 仅新增/覆盖必要样式：背景层、双页容器、Dock。不要动 .app-icon！ -->
   <style>
-  /* === 基础与背景 === */
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: #000;
-  }
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; width: 100%;
+      overflow: hidden;
+      background: #000; /* 背景图未加载时的兜底色 */
+    }
+    /* 背景图层：固定铺满，处于页面最底但不是负 z-index（避免被根背景盖掉） */
+    #bg-layer{
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none; user-select: none;
+    }
 
-  #bg-layer {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -2;
-  }
+    #theme-toggle{
+      position: fixed;
+      top: calc(env(safe-area-inset-top) + 8px);
+      right: 14px;
+      z-index: 3;
+    }
 
-  #theme-toggle {
-    position: fixed;
-    top: calc(env(safe-area-inset-top) + 8px);
-    right: 14px;
-    z-index: 10;
-    background: rgba(255,255,255,0.25);
-    backdrop-filter: blur(8px);
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    font-size: 20px;
-  }
+    /* 双页横滑容器（主屏 + 右滑页） */
+    #container{
+      position: relative;
+      z-index: 1;                 /* 在背景之上 */
+      display: flex;
+      width: 200%;
+      min-height: 100dvh;         /* iOS 动态视口单位，防止整体上移 */
+      transition: transform .4s ease;
+    }
+    .page{
+      width: 50%;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      /* 给底部留出 Dock 空间 */
+      padding-bottom: calc(env(safe-area-inset-bottom) + 110px);
+      /* 顶部安全区 */
+      padding-top: calc(env(safe-area-inset-top) + 10px);
+    }
+    /* 切到右滑页 */
+    #container.swiped{ transform: translateX(-50%); }
 
-  /* === 页面容器：双页结构 === */
-  #container {
-    display: flex;
-    width: 200%;
-    height: 100%;
-    transition: transform 0.4s ease;
-  }
-  .page {
-    width: 50%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 110px);
-  }
-  #container.swiped {
-    transform: translateX(-50%);
-  }
-
-  /* === 图标网格 === */
-  .app-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 90px);
-    grid-gap: 26px;
-    justify-content: center;
-    align-content: center;
-  }
-
-  .app-icon {
-    width: 90px;
-    height: 90px;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(12px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-  }
-  .app-icon img {
-    width: 46px;
-    height: 46px;
-  }
-  .app-icon p {
-    color: #fff;
-    font-size: 14px;
-    margin-top: 6px;
-    font-weight: 400;
-  }
-  .app-icon:active {
-    transform: scale(0.93);
-  }
-
-  /* === Dock 栏 === */
-  #dock {
-    position: fixed;
-    bottom: calc(env(safe-area-inset-bottom) + 20px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 70px;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(20px);
-    border-radius: 25px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 5;
-  }
-
-  .dock-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  .dock-item img {
-    width: 38px;
-    height: 38px;
-  }
-  .dock-item p {
-    color: #fff;
-    font-size: 12px;
-    margin-top: 4px;
-  }
+    /* Dock（唯一磨砂玻璃） */
+    #dock{
+      position: fixed;
+      left: 50%;
+      bottom: calc(env(safe-area-inset-bottom) + 20px);
+      transform: translateX(-50%);
+      z-index: 2;
+      width: 230px; height: 74px;
+      border-radius: 26px;
+      background: rgba(255,255,255,0.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.1);
+      backdrop-filter: blur(20px) saturate(1.1);
+      display: flex; align-items: center; justify-content: space-around;
+    }
+    #dock .dock-item{
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px;
+    }
+    #dock .dock-item img{ width: 40px; height: 40px; border-radius: 10px; }
+    #dock .dock-item p{ color:#fff; font-size:12px; margin:0; }
   </style>
 </head>
 
 <body>
-  <img id="bg-layer" src="assets/bg/night.jpeg" alt="background">
+  <!-- 背景：保持你之前成功的实现 -->
+  <img id="bg-layer" src="assets/bg/night.jpeg" alt="background" draggable="false">
+
   <button id="theme-toggle" aria-label="切换主题">🌗</button>
 
-  <!-- 页面容器 -->
+  <!-- 双页容器 -->
   <div id="container">
-    <!-- 首页 -->
+    <!-- 首页：剔除“消息/设置”，其它保持原样式（由 css/main.css 控制） -->
     <main class="page" id="home">
       <div class="app-grid">
         <div class="app-icon" data-app="diary"><img src="assets/icons/diary.png"><p>日记</p></div>
@@ -151,7 +102,7 @@
       </div>
     </main>
 
-    <!-- 右滑页 -->
+    <!-- 右滑页：只放“塔罗”，位置排在首页“消息”对应的第一格 -->
     <section class="page" id="right">
       <div class="app-grid">
         <div class="app-icon" data-app="tarot"><img src="assets/icons/tarot.png"><p>塔罗</p></div>
@@ -159,23 +110,25 @@
     </section>
   </div>
 
-  <!-- Dock 栏 -->
+  <!-- 固定 Dock（磨砂玻璃）：只放消息 & 设置 -->
   <div id="dock">
     <div class="dock-item" data-app="message"><img src="assets/icons/message.png"><p>消息</p></div>
     <div class="dock-item" data-app="settings"><img src="assets/icons/settings.png"><p>设置</p></div>
   </div>
 
+  <!-- App 容器（保持你的结构） -->
   <section id="app-container" style="display:none;"></section>
 
   <script>
-  let startX = 0;
-  const container = document.getElementById('container');
-  window.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-  window.addEventListener('touchend', e => {
-    const endX = e.changedTouches[0].clientX;
-    if (startX - endX > 80) container.classList.add('swiped');
-    if (endX - startX > 80) container.classList.remove('swiped');
-  });
+    // 简易左右滑动
+    let startX = 0;
+    const container = document.getElementById('container');
+    addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
+    addEventListener('touchend',   e => {
+      const endX = e.changedTouches[0].clientX;
+      if (startX - endX > 80)  container.classList.add('swiped');    // 右滑到塔罗
+      if (endX - startX > 80)  container.classList.remove('swiped'); // 左滑回主页
+    }, {passive:true});
   </script>
 </body>
 </html>
