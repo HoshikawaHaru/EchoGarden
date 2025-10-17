@@ -74,7 +74,7 @@ body{
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
 #homescreen {
-  min-height: calc(var(--vh) * 100 + 20px); /* 调整额外的底部高度 */
+  min-height: calc(var(--vh) * 100);  /* 移除额外的 20px */
   box-sizing: border-box;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
@@ -85,6 +85,7 @@ body{
   align-items: center;
   flex-direction: column;
 }
+
 
 /* ========= App 网格 ========= */
 .app-grid{
