@@ -12,11 +12,11 @@ html {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
-  object-fit: cover;               /* ✅ 自动等比例填满视口，不放大裁切 */
+  height: calc(100vh + var(--safe-bottom)); /* ✅ 修正后的高度 */
+  object-fit: cover;               /*  */
   object-position: center center;
   z-index: -1;
-  pointer-events: none;            /* 不影响交互 */
+  pointer-events: none; /* [cite: 6] */
   user-select: none;
 }
 
