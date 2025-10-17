@@ -8,7 +8,7 @@ function fixViewportHeight() {
   const vh = (viewport ? viewport.height : window.innerHeight) * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-  // 调整背景图层高度
+  // 调整背景图层高度，确保背景图层和 #homescreen 高度一致
   const bg = document.getElementById('bg-layer');
   if (bg && viewport) {
     bg.style.height = viewport.height + 'px';
