@@ -74,13 +74,16 @@ body{
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
 #homescreen {
-  min-height: calc(var(--vh) * 100);
+  min-height: calc(var(--vh) * 100); /* 确保屏幕高度动态计算 */
+  box-sizing: border-box;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
-  box-sizing: border-box;
+  flex-direction: column;
 }
 
 /* ========= App 网格 ========= */
