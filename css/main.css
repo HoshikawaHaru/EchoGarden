@@ -13,8 +13,8 @@ html {
   left: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;               /* ✅ 自动等比例填满视口，不放大裁切 */
-  object-position: center center;
+  background-size: cover; /* 确保背景图片自适应 */
+  background-position: center center;
   z-index: -1;
   pointer-events: none;            /* 不影响交互 */
   user-select: none;
