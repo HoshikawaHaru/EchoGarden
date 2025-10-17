@@ -30,14 +30,20 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        #bg-layer {
-            position: fixed;
-            inset: 0;                 /* ★修改点：top/left/width/height 合并，确保覆盖 */
-            width: 100%;
-            height: calc(var(--vh, 1vh) * 100);  /* ★修改点：用动态视口高度 */
-            object-fit: cover;
-            z-index: -1;
-        }
+   /* 修复底部白/黑边：向下多铺安全区 + 1px，避免 iOS 取整缝隙 */
+#bg-layer {
+  position: fixed;
+  top: -1px;                                 /* 上边也向外扩 1px 兜底 */
+  left: 0;
+  right: 0;
+  bottom: calc(-1px - env(safe-area-inset-bottom));  /* 关键：覆盖到安全区以下再多 1px */
+  width: 100%;
+  height: auto;                               /* 由 top/bottom 决定高度 */
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
 
         #theme-toggle {
             position: fixed;
@@ -256,3 +262,4 @@
     </script>
 </body>
 </html>
+
