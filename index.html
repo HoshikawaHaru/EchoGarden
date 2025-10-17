@@ -8,20 +8,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="rgba(0,0,0,0)">
 <title>Echo Garden</title>
-<link rel="stylesheet" href="css/main.css">
+
 <style>
+/* === 全屏背景 === */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: url('assets/bg/night.jpeg') no-repeat center center;
+  background: url('assets/bg/night.jpeg') no-repeat center center fixed;
   background-size: cover;
-  background-attachment: fixed;
+  -webkit-background-size: cover;
+  background-color: black; /* 防止底部白边 */
 }
 
-/* === 容器：主屏 + 右滑页 === */
+/* === 主容器：主屏 + 右滑页 === */
 #container {
   display: flex;
   width: 200%;
@@ -41,20 +43,33 @@ html, body {
   display: grid;
   grid-template-columns: repeat(3, 90px);
   grid-gap: 25px;
+  justify-content: center;
+  align-items: center;
 }
+
 .app {
+  position: relative;
   width: 90px;
   height: 90px;
   border-radius: 25px;
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.2);
   backdrop-filter: blur(15px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #fff;
+  color: rgba(255,255,255,0.9);
   font-size: 14px;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+.app img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  margin-bottom: 5px;
+  pointer-events: none;
 }
 
 /* === 滑动动画 === */
@@ -65,7 +80,7 @@ html, body {
 /* === Dock 栏 === */
 #dock {
   position: fixed;
-  bottom: 25px;
+  bottom: calc(25px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: 200px;
@@ -77,7 +92,9 @@ html, body {
   justify-content: space-around;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 100;
 }
+
 .dock-item {
   width: 60px;
   height: 60px;
@@ -89,11 +106,7 @@ html, body {
   color: #fff;
   font-size: 14px;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* 防止点击穿透 */
-#dock, .dock-item {
-  z-index: 100;
+  font-weight: 500;
 }
 </style>
 </head>
@@ -103,19 +116,19 @@ html, body {
     <!-- 首页 -->
     <section class="page" id="home">
       <div class="app-grid">
-        <div class="app">消息</div>
-        <div class="app">日记</div>
-        <div class="app">论坛</div>
-        <div class="app">单词</div>
-        <div class="app">心声</div>
-        <div class="app">设置</div>
+        <div class="app"><img src="assets/icons/message.png" alt="消息"><span>消息</span></div>
+        <div class="app"><img src="assets/icons/diary.png" alt="日记"><span>日记</span></div>
+        <div class="app"><img src="assets/icons/forum.png" alt="论坛"><span>论坛</span></div>
+        <div class="app"><img src="assets/icons/words.png" alt="单词"><span>单词</span></div>
+        <div class="app"><img src="assets/icons/heart.png" alt="心声"><span>心声</span></div>
+        <div class="app"><img src="assets/icons/setting.png" alt="设置"><span>设置</span></div>
       </div>
     </section>
 
     <!-- 右滑页（塔罗） -->
     <section class="page" id="right">
       <div class="app-grid">
-        <div class="app">塔罗</div>
+        <div class="app"><img src="assets/icons/tarot.png" alt="塔罗"><span>塔罗</span></div>
       </div>
     </section>
   </div>
