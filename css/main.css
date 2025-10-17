@@ -6,202 +6,179 @@ html {
   background-color: #000;
 }
 
-/* ========= 视口与安全区变量 ========= */
-:root {
-  --vh: 1vh;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-}
-
-/* ========= 重置与基础 ========= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden; /* ✅ 关键：禁止滚动，防止露底 */
-  position: fixed; /* ✅ 固定定位，防止地址栏影响 */
-  overscroll-behavior: none;
-}
-
-html {
-  background-color: #000; /* ✅ 纯黑保底 */
-}
-
-body {
-  background: transparent;
-  color: #fff;
-}
-
-/* ========= 背景图像层：关键优化 ========= */
+/* === 背景图像层（使用 <img> 避免 Safari 背景缩放错误） === */
 #bg-layer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  width: 100dvw; /* ✅ 使用动态视口单位 */
   height: 100vh;
-  height: 100dvh; /* ✅ iOS 15+ 支持，解决地址栏问题 */
-  
-  /* ✅ 关键：确保图片完全覆盖，允许裁切 */
-  object-fit: cover;
+  object-fit: cover;               /* ✅ 自动等比例填满视口，不放大裁切 */
   object-position: center center;
-  
   z-index: -1;
-  pointer-events: none;
+  pointer-events: none;            /* 不影响交互 */
   user-select: none;
-  display: block;
-  
-  /* ✅ 额外保险：稍微放大防止边缘露底 */
-  transform: scale(1.01);
 }
 
-/* ========= 主屏容器：改用固定高度 ========= */
-#homescreen {
-  position: fixed; /* ✅ 改为固定定位 */
-  top: 0;
+/* ========= 视口与安全区变量 ========= */
+:root{
+  --vh: 1vh; /* 会被 JS 重写为 window.innerHeight*0.01px */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* 动态壁纸变量：JS 写入 url('...') */
+  --bg-image: url('assets/bg/night.jpeg');
+}
+
+/* ========= 把背景画在 html（根节点）上！覆盖到灵动岛 ========= */
+/*html {
+  margin: 0;
+  padding: 0;
+  background-image: var(--bg-image, url('assets/bg/night.jpeg'));
+  background-repeat: no-repeat;
+  background-size: 100% auto;       
+  background-position: center top;  
+  background-color: #000;
+}*/
+
+/* === 底部补偿层：用于填满Safari底部黑条 === */
+/*html::after {
+  content: "";
+  position: fixed;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh; /* ✅ 动态视口 */
-  
-  /* ✅ 使用 padding 处理安全区，不改变高度 */
+  right: 0;
+  bottom: 0;
+  height: env(safe-area-inset-bottom, 20px);  /* 
+  background-image: var(--bg-image, url('assets/bg/night.jpeg'));
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: center bottom;
+  z-index: -1;
+}*/
+
+/* body 不再承担背景，只负责布局 */
+body{
+  margin:0; padding:0;
+  /* 不要 position:fixed / inset:0；避免根层被裁切 */
+  background: transparent;
+  color: #fff;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
+#homescreen{
+  /* 补上底部安全区高度，避免黑边 */
+  min-height: calc(var(--vh) * 100 + var(--safe-bottom));
+  box-sizing: border-box;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  
-  overflow: hidden; /* ✅ 防止内容溢出 */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
 }
 
 /* ========= App 网格 ========= */
-.app-grid {
-  display: grid;
+.app-grid{
+  display:grid;
   grid-template-columns: repeat(4, 80px);
   grid-gap: 24px 16px;
   justify-content: center;
   align-content: center;
 }
 
-.app-icon {
-  text-align: center;
-  color: #fff;
-  user-select: none;
-  cursor: pointer;
-  transition: transform 0.1s ease;
+.app-icon{
+  text-align:center;
+  color:#fff;
+  user-select:none;
 }
-
-.app-icon:active {
-  transform: scale(0.95);
-}
-
-.app-icon img {
-  width: 60px;
-  height: 60px;
-  border-radius: 20%;
+.app-icon img{
+  width:60px; height:60px;
+  border-radius:20%;
   backdrop-filter: blur(5px);
-  background: rgba(255, 255, 255, 0.1);
-  display: block;
-  margin: 0 auto;
+  background: rgba(255,255,255,0.1);
 }
-
-.app-icon p {
-  font-size: 11px;
-  margin-top: 4px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+.app-icon p{
+  font-size:11px; margin-top:4px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 /* ========= 主题切换按钮 ========= */
-#theme-toggle {
+#theme-toggle{
   position: fixed;
   top: calc(12px + var(--safe-top));
   right: calc(12px + var(--safe-right));
   z-index: 10;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255,255,255,0.25);
   color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  font-size: 18px;
+  border:none; border-radius:50%;
+  width:42px; height:42px; font-size:18px;
   backdrop-filter: blur(8px);
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor:pointer;
+  transition: background .3s ease, transform .2s ease;
 }
-
-#theme-toggle:active {
-  background: rgba(255, 255, 255, 0.35);
-  transform: scale(0.95);
-}
-
-body.light #theme-toggle {
-  background: rgba(0, 0, 0, 0.1);
-  color: #000;
-}
+#theme-toggle:active{ background: rgba(255,255,255,0.35); transform: scale(0.95); }
+body.light #theme-toggle{ background: rgba(0,0,0,0.1); color:#000; }
 
 /* ========= App 页面容器 ========= */
-#app-container {
+#app-container{
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  
-  display: none;
-  background: rgba(0, 0, 0, 0.9);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  
+  inset: 0;
+  display:none;
+  background: rgba(0,0,0,0.9);
+  overflow-y:auto;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
-  
-  z-index: 100;
+}
+--------------------------main.js
+// ============ 主题切换 ============
+const themeToggle = document.getElementById('theme-toggle');
+let isLight = false;
+
+// 改：把壁纸写到 <html> 的 CSS 变量上
+function setThemeBackground(imageUrl, isLightMode = false) {
+  const bgLayer = document.getElementById('bg-layer');
+  const meta = document.querySelector('meta[name="theme-color"]');
+
+  if (bgLayer) {
+    bgLayer.src = imageUrl;  // ✅ 直接切换 <img> 的源文件
+  }
+  if (meta) meta.setAttribute('content', 'rgba(0,0,0,0)');
+  document.body.classList.toggle('light', isLightMode);
 }
 
-/* ========= 浅色主题 ========= */
-body.light #bg-layer {
-  /* 可以在这里调整浅色模式的背景 */
-}
-
-/* ========= iOS 专用修复（降级方案） ========= */
-@supports not (height: 100dvh) {
-  /* 不支持 dvh 的旧浏览器 */
-  #bg-layer {
-    height: calc(var(--vh, 1vh) * 100);
-    /* ✅ 额外增加高度防止露底 */
-    min-height: calc(var(--vh, 1vh) * 100 + 50px);
-  }
-  
-  #homescreen {
-    height: calc(var(--vh, 1vh) * 100);
-  }
-  
-  #app-container {
-    height: calc(var(--vh, 1vh) * 100);
+function toggleTheme() {
+  isLight = !isLight;
+  if (isLight) {
+    setThemeBackground('assets/bg/day.jpeg', true);
+    themeToggle.textContent = '🌞';
+  } else {
+    setThemeBackground('assets/bg/night.jpeg', false);
+    themeToggle.textContent = '🌙';
   }
 }
 
-/* ========= 横屏优化 ========= */
-@media (orientation: landscape) {
-  #bg-layer {
-    /* 横屏时确保宽度覆盖 */
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-  }
+// 初始：跟随系统
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+setThemeBackground(prefersLight ? 'assets/bg/day.jpeg' : 'assets/bg/night.jpeg', prefersLight);
+isLight = prefersLight;
+themeToggle.textContent = prefersLight ? '🌞' : '🌙';
+themeToggle.addEventListener('click', toggleTheme);
+
+// ============ 修正 iOS 视口高度丢失（给内容容器用） ============
+function fixViewportHeight() {
+  // 计算真实视窗高度（包含安全区）
+  const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
+
+fixViewportHeight();
+window.addEventListener('resize', fixViewportHeight);
+window.addEventListener('orientationchange', fixViewportHeight);
