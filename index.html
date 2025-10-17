@@ -1,148 +1,65 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="rgba(0,0,0,0)">
-<title>Echo Garden</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- 🍎 iOS 全屏与状态栏 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="rgba(0,0,0,0)">
+  <title>Echo Garden</title>
 
-<style>
-/* === 背景全屏覆盖 === */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  background: url('assets/bg/night.jpeg') no-repeat center center fixed;
-  background-size: cover;
-  background-color: #000; /* 防止闪白 */
-}
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
+  <link rel="icon" href="assets/icons/icon512.png" type="image/png">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #000;
+    }
 
-/* === 主容器 === */
-#container {
-  display: flex;
-  width: 200%;
-  height: 100vh;
-  transition: transform 0.4s ease;
-}
-.page {
-  width: 50%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    /* 背景全屏覆盖，防止 Safari 白边黑边 */
+    #bg-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
 
-/* === 图标区样式 === */
-.app-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 90px);
-  grid-gap: 25px;
-  justify-content: center;
-  align-items: center;
-}
+    /* 主容器：主屏 + 右滑页 */
+    #container {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transition: transform 0.4s ease;
+    }
+    .page {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-/* 保留原样式，不用毛玻璃，只是轻雾面 */
-.app {
-  width: 90px;
-  height: 90px;
-  border-radius: 25px;
-  background: rgba(255,255,255,0.15);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: rgba(255,255,255,0.95);
-  font-size: 14px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
+    /* 图标网格 */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 24px;
+      justify-items: center;
+      align-items: center;
+      width: 90%;
+      max-width: 400px;
+    }
 
-/* === 滑动动画 === */
-#container.swiped {
-  transform: translateX(-50%);
-}
-
-/* === Dock 栏（唯一毛玻璃区域）=== */
-#dock {
-  position: fixed;
-  bottom: env(safe-area-inset-bottom, 0);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 70px;
-  background: rgba(255,255,255,0.25);
-  backdrop-filter: blur(15px);
-  border-radius: 25px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  z-index: 100;
-  padding-bottom: calc(env(safe-area-inset-bottom) / 2);
-}
-
-.dock-item {
-  width: 60px;
-  height: 60px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.35);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  font-size: 14px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  font-weight: 500;
-}
-
-/* 防止底部白条 */
-html {
-  background-color: #000;
-}
-</style>
-</head>
-
-<body>
-  <div id="container">
-    <!-- 首页 -->
-    <section class="page" id="home">
-      <div class="app-grid">
-        <div class="app">日记</div>
-        <div class="app">论坛</div>
-        <div class="app">单词</div>
-        <div class="app">心声</div>
-      </div>
-    </section>
-
-    <!-- 右滑页（塔罗） -->
-    <section class="page" id="right">
-      <div class="app-grid">
-        <div class="app">塔罗</div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Dock 栏 -->
-  <div id="dock">
-    <div class="dock-item">消息</div>
-    <div class="dock-item">设置</div>
-  </div>
-
-  <script>
-  let startX = 0;
-  const container = document.getElementById('container');
-
-  window.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-  window.addEventListener('touchend', e => {
-    let endX = e.changedTouches[0].clientX;
-    if (startX - endX > 80) container.classList.add('swiped');   // 右滑到塔罗页
-    if (endX - startX > 80) container.classList.remove('swiped'); // 左滑回主屏
-  });
-  </script>
-</body>
-</html>
+    .app-icon {
+      width: 80px;
+      text-align: center;
+    }
