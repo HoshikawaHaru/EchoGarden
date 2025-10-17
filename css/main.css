@@ -13,6 +13,7 @@ html {
   padding: 0;
   background-color: #000;
   overscroll-behavior: none;
+  height: 100%;
 }
 
 /* ========= Body ========= */
@@ -23,20 +24,24 @@ body {
   color: #fff;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
+  min-height: 100%;
 }
 
-/* ========= 背景图像层：核心修复 ========= */
+/* ========= 背景图像层：彻底解决黑边 ========= */
 #bg-layer {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  /* ✅ 关键修复：让背景超出底部安全区 */
-  height: calc(100vh + var(--safe-bottom));
-  min-height: 100vh;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* ✅ 关键：用 padding 扩展到底部安全区之外 */
+  padding-bottom: var(--safe-bottom);
   
   object-fit: cover;
-  object-position: center top; /* ✅ 从顶部对齐，让底部自然延伸 */
+  object-position: center center;
   
   z-index: -1;
   pointer-events: none;
@@ -46,13 +51,11 @@ body {
 
 /* ========= 主屏容器 ========= */
 #homescreen {
-  /* ✅ 关键：容器高度 = 视口高度，不额外加 safe-bottom */
   min-height: 100vh;
   min-height: calc(var(--vh, 1vh) * 100);
   
   box-sizing: border-box;
   
-  /* ✅ 用 padding 留出安全区空间 */
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
@@ -62,6 +65,8 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  
+  position: relative;
 }
 
 /* ========= App 网格 ========= */
@@ -133,4 +138,12 @@ body.light #theme-toggle {
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
+}
+
+/* ========= iOS 专用：额外保险 ========= */
+@supports (-webkit-touch-callout: none) {
+  #bg-layer {
+    /* iOS 设备：背景图额外向下延伸 */
+    bottom: calc(-1 * var(--safe-bottom));
+  }
 }
