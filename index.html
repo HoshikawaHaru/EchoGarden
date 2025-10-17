@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="rgba(0,0,0,0)">
     <title>Echo Garden</title>
     <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
     <link rel="icon" href="assets/icons/icon512.png" type="image/png">
@@ -16,7 +17,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html {
+        html, body {
             width: 100%;
             height: 100%;
             overflow: hidden;
@@ -24,32 +25,22 @@
         }
 
         body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #000;
         }
 
         #bg-layer {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 0;
+            z-index: -1;
         }
 
         #theme-toggle {
             position: fixed;
-            top: 20px;
-            top: max(20px, env(safe-area-inset-top));
+            top: env(safe-area-inset-top, 20px);
             right: 20px;
             width: 50px;
             height: 50px;
@@ -61,6 +52,7 @@
             cursor: pointer;
             z-index: 100;
             transition: transform 0.2s;
+            margin-top: 20px;
         }
 
         #theme-toggle:active {
@@ -69,19 +61,16 @@
 
         /* 滑动容器 */
         #swipe-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 100%;
+            width: 200vw;
+            height: 100vh;
             display: flex;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 1;
+            position: relative;
         }
 
         .page {
-            width: 50%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -128,12 +117,13 @@
         /* Dock 栏样式 */
         #dock {
             position: fixed;
-            bottom: 20px;
+            bottom: env(safe-area-inset-bottom, 20px);
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 25px;
             padding: 12px 25px;
+            margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(30px) saturate(180%);
             -webkit-backdrop-filter: blur(30px) saturate(180%);
@@ -141,7 +131,6 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.2);
             z-index: 1000;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
 
         #dock .app-icon {
@@ -162,12 +151,13 @@
         /* 页面指示器 */
         .page-indicators {
             position: fixed;
-            bottom: 120px;
+            bottom: env(safe-area-inset-bottom, 20px);
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 8px;
             z-index: 999;
+            margin-bottom: 110px;
         }
 
         .page-indicator {
@@ -186,12 +176,6 @@
 
         #app-container {
             display: none;
-        }
-
-        @supports (-webkit-touch-callout: none) {
-            body {
-                height: -webkit-fill-available;
-            }
         }
     </style>
 </head>
@@ -263,7 +247,7 @@
 
         function updatePage(page) {
             currentPage = Math.max(0, Math.min(1, page));
-            swipeContainer.style.transform = `translateX(-${currentPage * 50}%)`;
+            swipeContainer.style.transform = `translateX(-${currentPage * 100}vw)`;
             
             indicators.forEach((ind, idx) => {
                 ind.classList.toggle('active', idx === currentPage);
@@ -280,8 +264,8 @@
             if (!isDragging) return;
             currentX = e.touches[0].clientX;
             const diff = currentX - startX;
-            const offset = -currentPage * 50 + (diff / window.innerWidth) * 50;
-            swipeContainer.style.transform = `translateX(${offset}%)`;
+            const offset = -currentPage * 100 + (diff / window.innerWidth) * 100;
+            swipeContainer.style.transform = `translateX(${offset}vw)`;
         });
 
         swipeContainer.addEventListener('touchend', (e) => {
