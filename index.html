@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
@@ -22,6 +22,8 @@
             height: 100%;
             overflow: hidden;
             position: fixed;
+            background: #000; /* ★修改点：避免底部露出默认白色 */
+            overscroll-behavior: none; /* ★修改点：避免回弹露底 */
         }
 
         body {
@@ -30,17 +32,16 @@
 
         #bg-layer {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;                 /* ★修改点：top/left/width/height 合并，确保覆盖 */
             width: 100%;
-            height: 100%;
+            height: calc(var(--vh, 1vh) * 100);  /* ★修改点：用动态视口高度 */
             object-fit: cover;
             z-index: -1;
         }
 
         #theme-toggle {
             position: fixed;
-            top: env(safe-area-inset-top, 20px);
+            top: calc(env(safe-area-inset-top) + 20px);
             right: 20px;
             width: 50px;
             height: 50px;
@@ -52,17 +53,13 @@
             cursor: pointer;
             z-index: 100;
             transition: transform 0.2s;
-            margin-top: 20px;
         }
-
-        #theme-toggle:active {
-            transform: scale(0.9);
-        }
+        #theme-toggle:active { transform: scale(0.9); }
 
         /* 滑动容器 */
         #swipe-container {
             width: 200vw;
-            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);  /* ★修改点 */
             display: flex;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
@@ -70,7 +67,7 @@
 
         .page {
             width: 100vw;
-            height: 100vh;
+            min-height: calc(var(--vh, 1vh) * 100); /* ★修改点：防止比视口短 */
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -78,7 +75,7 @@
             padding-bottom: 140px;
         }
 
-        /* App 网格布局 */
+        /* App 网格布局（原样） */
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -87,95 +84,51 @@
             max-width: 500px;
             margin: 0 auto;
         }
+        .app-icon { display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform .2s; }
+        .app-icon:active { transform: scale(0.9); }
+        .app-icon img { width:70px; height:70px; border-radius:16px; margin-bottom:8px; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+        .app-icon p { font-size:13px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); }
 
-        .app-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .app-icon:active {
-            transform: scale(0.9);
-        }
-
-        .app-icon img {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            margin-bottom: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .app-icon p {
-            font-size: 13px;
-            color: white;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Dock 栏样式 */
+        /* Dock 栏样式（原样） */
         #dock {
             position: fixed;
-            bottom: env(safe-area-inset-bottom, 20px);
+            bottom: calc(env(safe-area-inset-bottom) + 20px);
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 25px;
             padding: 12px 25px;
-            margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(30px) saturate(180%);
             -webkit-backdrop-filter: blur(30px) saturate(180%);
             border-radius: 22px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.2);
             z-index: 1000;
         }
+        #dock .app-icon { margin:0; }
+        #dock .app-icon img { width:60px; height:60px; border-radius:14px; margin-bottom:0; }
+        #dock .app-icon p { display:none; }
 
-        #dock .app-icon {
-            margin: 0;
-        }
-
-        #dock .app-icon img {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
-            margin-bottom: 0;
-        }
-
-        #dock .app-icon p {
-            display: none;
-        }
-
-        /* 页面指示器 */
+        /* 页面指示器（原样） */
         .page-indicators {
             position: fixed;
-            bottom: env(safe-area-inset-bottom, 20px);
+            bottom: calc(env(safe-area-inset-bottom) + 110px);
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 8px;
             z-index: 999;
-            margin-bottom: 110px;
         }
+        .page-indicator { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); transition:all .3s; }
+        .page-indicator.active { background: rgba(255,255,255,.9); width:24px; border-radius:4px; }
 
-        .page-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transition: all 0.3s;
-        }
+        #app-container { display:none; }
 
-        .page-indicator.active {
-            background: rgba(255, 255, 255, 0.9);
-            width: 24px;
-            border-radius: 4px;
-        }
-
-        #app-container {
-            display: none;
+        /* ★修改点：支持时优先用 100dvh（iOS 16+ 更稳） */
+        @supports (height: 100dvh) {
+            #bg-layer { height: 100dvh; }
+            #swipe-container { height: 100dvh; }
+            .page { min-height: 100dvh; }
         }
     </style>
 </head>
@@ -237,28 +190,31 @@
     <section id="app-container" style="display:none;"></section>
 
     <script>
-        // 滑动逻辑
+        /* ★修改点：仅在窗口尺寸变化时计算一次动态视口，无轮询 */
+        const setVH = () => {
+          const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
+          document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+        setVH();
+        window.addEventListener('resize', setVH, {passive:true});
+        window.addEventListener('orientationchange', setVH, {passive:true});
+
+        // 滑动逻辑（原样）
         const swipeContainer = document.getElementById('swipe-container');
         const indicators = document.querySelectorAll('.page-indicator');
-        let currentPage = 0;
-        let startX = 0;
-        let currentX = 0;
-        let isDragging = false;
+        let currentPage = 0, startX = 0, currentX = 0, isDragging = false;
 
         function updatePage(page) {
             currentPage = Math.max(0, Math.min(1, page));
             swipeContainer.style.transform = `translateX(-${currentPage * 100}vw)`;
-            
-            indicators.forEach((ind, idx) => {
-                ind.classList.toggle('active', idx === currentPage);
-            });
+            indicators.forEach((ind, idx) => ind.classList.toggle('active', idx === currentPage));
         }
 
         swipeContainer.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             isDragging = true;
             swipeContainer.style.transition = 'none';
-        });
+        }, {passive:true});
 
         swipeContainer.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
@@ -266,39 +222,31 @@
             const diff = currentX - startX;
             const offset = -currentPage * 100 + (diff / window.innerWidth) * 100;
             swipeContainer.style.transform = `translateX(${offset}vw)`;
-        });
+        }, {passive:true});
 
-        swipeContainer.addEventListener('touchend', (e) => {
+        swipeContainer.addEventListener('touchend', () => {
             if (!isDragging) return;
             isDragging = false;
             swipeContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            
             const diff = currentX - startX;
             if (Math.abs(diff) > 50) {
-                if (diff < 0 && currentPage < 1) {
-                    updatePage(currentPage + 1);
-                } else if (diff > 0 && currentPage > 0) {
-                    updatePage(currentPage - 1);
-                } else {
-                    updatePage(currentPage);
-                }
+                updatePage(diff < 0 ? currentPage + 1 : currentPage - 1);
             } else {
                 updatePage(currentPage);
             }
-        });
+        }, {passive:true});
 
-        // 主题切换
+        // 主题切换（原样）
         const themeToggle = document.getElementById('theme-toggle');
         const bgLayer = document.getElementById('bg-layer');
         let isDarkTheme = true;
-
         themeToggle.addEventListener('click', () => {
             isDarkTheme = !isDarkTheme;
             bgLayer.src = isDarkTheme ? 'assets/bg/night.jpeg' : 'assets/bg/day.jpeg';
             themeToggle.textContent = isDarkTheme ? '🌙' : '☀️';
         });
 
-        // App 点击事件
+        // App 点击事件（原样）
         document.querySelectorAll('.app-icon').forEach(icon => {
             icon.addEventListener('click', () => {
                 const appName = icon.dataset.app;
