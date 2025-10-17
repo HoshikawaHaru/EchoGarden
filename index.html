@@ -155,6 +155,13 @@ function updateTime() {
 // 页面加载时开始更新
 updateTime();
 
+  document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    updateTime();  // 页面变为可见时，手动刷新一次
+  }
+});
+
+
 // 电量更新
 navigator.getBattery && navigator.getBattery().then(b => {
   const updateBattery = () => {
@@ -187,6 +194,7 @@ navigator.getBattery && navigator.getBattery().then(b => {
   <section id="app-container" style="display:none;"></section>
 </body>
 </html>
+
 
 
 
