@@ -1,0 +1,15 @@
+{
+  "short_name": "Echo Garden",
+  "name": "Echo Garden",
+  "start_url": "./index.html",
+  "display": "standalone",  // 这会让应用以全屏模式启动
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "assets/icons/icon512.png",  // 用你自己的图标路径
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
