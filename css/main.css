@@ -44,19 +44,19 @@ html {
 }*/
 
 /* === 底部补偿层：用于填满Safari底部黑条 === */
-html::after {
+/*html::after {
   content: "";
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: env(safe-area-inset-bottom, 20px);
+  height: env(safe-area-inset-bottom, 20px);  /* 
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center bottom;
   z-index: -1;
-}
+}*/
 
 /* body 不再承担背景，只负责布局 */
 body{
@@ -66,26 +66,22 @@ body{
   color: #fff;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
-  background: transparent !important;
-  /* 其他样式保持不变 */
-}
-
 }
 
 /* ========= 主屏容器：用 --vh 来保证“看起来”满屏 ========= */
-#homescreen {
-  min-height: calc(var(--vh) * 100);  /* 移除额外的 20px */
+#homescreen{
+  /* 补上底部安全区高度，避免黑边 */
+  min-height: calc(var(--vh) * 100 + var(--safe-bottom));
   box-sizing: border-box;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
 }
-
 
 /* ========= App 网格 ========= */
 .app-grid{
