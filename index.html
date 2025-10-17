@@ -12,34 +12,36 @@
 
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
   <link rel="icon" href="assets/icons/icon512.png" type="image/png">
+
   <style>
+    /* === 背景全屏覆盖 === */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
       overflow: hidden;
-      background: #000;
+      background-color: black;
     }
 
-    /* 背景全屏覆盖，防止 Safari 白边黑边 */
     #bg-layer {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       object-fit: cover;
       z-index: -1;
     }
 
-    /* 主容器：主屏 + 右滑页 */
+    /* === 页面容器：左右滑动 === */
     #container {
       display: flex;
       width: 200%;
       height: 100%;
       transition: transform 0.4s ease;
     }
+
     .page {
       width: 50%;
       height: 100%;
@@ -48,18 +50,15 @@
       align-items: center;
     }
 
-    /* 图标网格 */
+    /* === App 图标网格 === */
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, 90px);
       grid-gap: 24px;
-      justify-items: center;
+      justify-content: center;
       align-items: center;
-      width: 90%;
-      max-width: 400px;
     }
 
     .app-icon {
-      width: 80px;
-      text-align: center;
-    }
+      width: 90px;
+      h
