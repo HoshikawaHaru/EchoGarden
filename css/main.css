@@ -44,19 +44,19 @@ html {
 }*/
 
 /* === 底部补偿层：用于填满Safari底部黑条 === */
-html::after {
+/*html::after {
   content: "";
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: env(safe-area-inset-bottom, 20px);  
+  height: env(safe-area-inset-bottom, 20px);  /* 
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center bottom;
   z-index: -1;
-}
+}*/
 
 /* body 不再承担背景，只负责布局 */
 body{
