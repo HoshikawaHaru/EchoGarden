@@ -1,134 +1,305 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <!-- 🍎 iOS 全屏与状态栏 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="rgba(0,0,0,0)">
-  <title>Echo Garden</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="rgba(0,0,0,0)">
+    <title>Echo Garden</title>
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
+    <link rel="icon" href="assets/icons/icon512.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  <link rel="stylesheet" href="css/main.css"><!-- 保留你之前成功的样式 -->
-  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
-  <link rel="icon" href="assets/icons/icon512.png" type="image/png">
-  <script src="js/main.js" defer></script>
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            position: fixed;
+        }
 
-  <!-- 仅新增/覆盖必要样式：背景层、双页容器、Dock。不要动 .app-icon！ -->
-  <style>
-    html, body {
-      margin: 0; padding: 0;
-      height: 100%; width: 100%;
-      overflow: hidden;
-      background: #000; /* 背景图未加载时的兜底色 */
-    }
-    /* 背景图层：固定铺满，处于页面最底但不是负 z-index（避免被根背景盖掉） */
-    #bg-layer{
-      position: fixed; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      pointer-events: none; user-select: none;
-    }
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
 
-    #theme-toggle{
-      position: fixed;
-      top: calc(env(safe-area-inset-top) + 8px);
-      right: 14px;
-      z-index: 3;
-    }
+        #theme-toggle {
+            position: fixed;
+            top: max(env(safe-area-inset-top), 20px);
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.2s;
+        }
 
-    /* 双页横滑容器（主屏 + 右滑页） */
-    #container{
-      position: relative;
-      z-index: 1;                 /* 在背景之上 */
-      display: flex;
-      width: 200%;
-      min-height: 100dvh;         /* iOS 动态视口单位，防止整体上移 */
-      transition: transform .4s ease;
-    }
-    .page{
-      width: 50%;
-      min-height: 100dvh;
-      display: grid;
-      place-items: center;
-      /* 给底部留出 Dock 空间 */
-      padding-bottom: calc(env(safe-area-inset-bottom) + 110px);
-      /* 顶部安全区 */
-      padding-top: calc(env(safe-area-inset-top) + 10px);
-    }
-    /* 切到右滑页 */
-    #container.swiped{ transform: translateX(-50%); }
+        #theme-toggle:active {
+            transform: scale(0.9);
+        }
 
-    /* Dock（唯一磨砂玻璃） */
-    #dock{
-      position: fixed;
-      left: 50%;
-      bottom: calc(env(safe-area-inset-bottom) + 20px);
-      transform: translateX(-50%);
-      z-index: 2;
-      width: 230px; height: 74px;
-      border-radius: 26px;
-      background: rgba(255,255,255,0.2);
-      -webkit-backdrop-filter: blur(20px) saturate(1.1);
-      backdrop-filter: blur(20px) saturate(1.1);
-      display: flex; align-items: center; justify-content: space-around;
-    }
-    #dock .dock-item{
-      display: flex; flex-direction: column; align-items: center;
-      gap: 4px;
-    }
-    #dock .dock-item img{ width: 40px; height: 40px; border-radius: 10px; }
-    #dock .dock-item p{ color:#fff; font-size:12px; margin:0; }
-  </style>
+        /* 滑动容器 */
+        #swipe-container {
+            width: 200vw;
+            height: 100vh;
+            display: flex;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+
+        .page {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 120px;
+        }
+
+        /* App 网格布局 */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .app-icon:active {
+            transform: scale(0.9);
+        }
+
+        .app-icon img {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .app-icon p {
+            font-size: 13px;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dock 栏样式 */
+        #dock {
+            position: fixed;
+            bottom: max(env(safe-area-inset-bottom), 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 25px;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+        }
+
+        #dock .app-icon {
+            margin: 0;
+        }
+
+        #dock .app-icon img {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            margin-bottom: 0;
+        }
+
+        #dock .app-icon p {
+            display: none;
+        }
+
+        /* 页面指示器 */
+        .page-indicators {
+            position: fixed;
+            bottom: max(env(safe-area-inset-bottom, 20px) + 100px, 120px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 999;
+        }
+
+        .page-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .page-indicator.active {
+            background: rgba(255, 255, 255, 0.9);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        #app-container {
+            display: none;
+        }
+    </style>
 </head>
-
 <body>
-  <!-- 背景：保持你之前成功的实现 -->
-  <img id="bg-layer" src="assets/bg/night.jpeg" alt="background" draggable="false">
+    <img id="bg-layer" src="assets/bg/night.jpeg" alt="background">
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
 
-  <button id="theme-toggle" aria-label="切换主题">🌗</button>
+    <!-- 滑动容器 -->
+    <div id="swipe-container">
+        <!-- 第一页 -->
+        <div class="page" id="page-1">
+            <div class="app-grid">
+                <div class="app-icon" data-app="diary">
+                    <img src="assets/icons/diary.png" alt="日记">
+                    <p>日记</p>
+                </div>
+                <div class="app-icon" data-app="forum">
+                    <img src="assets/icons/forum.png" alt="论坛">
+                    <p>论坛</p>
+                </div>
+                <div class="app-icon" data-app="words">
+                    <img src="assets/icons/words.png" alt="单词">
+                    <p>单词</p>
+                </div>
+                <div class="app-icon" data-app="memo">
+                    <img src="assets/icons/memo.png" alt="心声">
+                    <p>心声</p>
+                </div>
+            </div>
+        </div>
 
-  <!-- 双页容器 -->
-  <div id="container">
-    <!-- 首页：剔除“消息/设置”，其它保持原样式（由 css/main.css 控制） -->
-    <main class="page" id="home">
-      <div class="app-grid">
-        <div class="app-icon" data-app="diary"><img src="assets/icons/diary.png"><p>日记</p></div>
-        <div class="app-icon" data-app="forum"><img src="assets/icons/forum.png"><p>论坛</p></div>
-        <div class="app-icon" data-app="words"><img src="assets/icons/words.png"><p>单词</p></div>
-        <div class="app-icon" data-app="memo"><img src="assets/icons/memo.png"><p>心声</p></div>
-      </div>
-    </main>
+        <!-- 第二页 -->
+        <div class="page" id="page-2">
+            <div class="app-grid">
+                <div class="app-icon" data-app="tarot">
+                    <img src="assets/icons/tarot.png" alt="塔罗">
+                    <p>塔罗</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- 右滑页：只放“塔罗”，位置排在首页“消息”对应的第一格 -->
-    <section class="page" id="right">
-      <div class="app-grid">
-        <div class="app-icon" data-app="tarot"><img src="assets/icons/tarot.png"><p>塔罗</p></div>
-      </div>
-    </section>
-  </div>
+    <!-- 页面指示器 -->
+    <div class="page-indicators">
+        <div class="page-indicator active"></div>
+        <div class="page-indicator"></div>
+    </div>
 
-  <!-- 固定 Dock（磨砂玻璃）：只放消息 & 设置 -->
-  <div id="dock">
-    <div class="dock-item" data-app="message"><img src="assets/icons/message.png"><p>消息</p></div>
-    <div class="dock-item" data-app="settings"><img src="assets/icons/settings.png"><p>设置</p></div>
-  </div>
+    <!-- Dock 栏 -->
+    <div id="dock">
+        <div class="app-icon" data-app="message">
+            <img src="assets/icons/message.png" alt="消息">
+        </div>
+        <div class="app-icon" data-app="settings">
+            <img src="assets/icons/settings.png" alt="设置">
+        </div>
+    </div>
 
-  <!-- App 容器（保持你的结构） -->
-  <section id="app-container" style="display:none;"></section>
+    <section id="app-container" style="display:none;"></section>
 
-  <script>
-    // 简易左右滑动
-    let startX = 0;
-    const container = document.getElementById('container');
-    addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
-    addEventListener('touchend',   e => {
-      const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 80)  container.classList.add('swiped');    // 右滑到塔罗
-      if (endX - startX > 80)  container.classList.remove('swiped'); // 左滑回主页
-    }, {passive:true});
-  </script>
+    <script>
+        // 滑动逻辑
+        const swipeContainer = document.getElementById('swipe-container');
+        const indicators = document.querySelectorAll('.page-indicator');
+        let currentPage = 0;
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        function updatePage(page) {
+            currentPage = Math.max(0, Math.min(1, page));
+            swipeContainer.style.transform = `translateX(-${currentPage * 100}vw)`;
+            
+            indicators.forEach((ind, idx) => {
+                ind.classList.toggle('active', idx === currentPage);
+            });
+        }
+
+        swipeContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            swipeContainer.style.transition = 'none';
+        });
+
+        swipeContainer.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+            const offset = -currentPage * 100 + (diff / window.innerWidth) * 100;
+            swipeContainer.style.transform = `translateX(${offset}vw)`;
+        });
+
+        swipeContainer.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            swipeContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            
+            const diff = currentX - startX;
+            if (Math.abs(diff) > 50) {
+                if (diff < 0 && currentPage < 1) {
+                    updatePage(currentPage + 1);
+                } else if (diff > 0 && currentPage > 0) {
+                    updatePage(currentPage - 1);
+                } else {
+                    updatePage(currentPage);
+                }
+            } else {
+                updatePage(currentPage);
+            }
+        });
+
+        // 主题切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const bgLayer = document.getElementById('bg-layer');
+        let isDarkTheme = true;
+
+        themeToggle.addEventListener('click', () => {
+            isDarkTheme = !isDarkTheme;
+            bgLayer.src = isDarkTheme ? 'assets/bg/night.jpeg' : 'assets/bg/day.jpeg';
+            themeToggle.textContent = isDarkTheme ? '🌙' : '☀️';
+        });
+
+        // App 点击事件（可以根据需要添加）
+        document.querySelectorAll('.app-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                const appName = icon.dataset.app;
+                console.log('打开应用:', appName);
+                // 这里可以添加打开应用的逻辑
+            });
+        });
+    </script>
 </body>
 </html>
