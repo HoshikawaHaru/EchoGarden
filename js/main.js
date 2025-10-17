@@ -3,15 +3,16 @@ const themeToggle = document.getElementById('theme-toggle');
 let isLight = false;
 
 // 改：把壁纸写到 <html> 的 CSS 变量上
-function setThemeBackground(imageUrl, isLightMode = false) {
-  const bgLayer = document.getElementById('bg-layer');
-  const meta = document.querySelector('meta[name="theme-color"]');
+function fixViewportHeight() {
+  const viewport = window.visualViewport;
+  const vh = (viewport ? viewport.height : window.innerHeight) * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-  if (bgLayer) {
-    bgLayer.src = imageUrl;  // ✅ 直接切换 <img> 的源文件
+  // 调整背景图层高度
+  const bg = document.getElementById('bg-layer');
+  if (bg && viewport) {
+    bg.style.height = viewport.height + 'px';
   }
-  if (meta) meta.setAttribute('content', 'rgba(0,0,0,0)');
-  document.body.classList.toggle('light', isLightMode);
 }
 
 function toggleTheme() {
