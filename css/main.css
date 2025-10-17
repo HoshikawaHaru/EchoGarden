@@ -7,7 +7,7 @@ html {
 }
 
 /* ========= 视口与安全区变量 ========= */
-:root{
+:root {
   --vh: 1vh;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -15,56 +15,65 @@ html {
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
-/* ========= 背景图像层（使用 <img> 避免 Safari 背景缩放错误） ========= */
+/* ========= 重置与基础 ========= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* ✅ 关键：禁止滚动，防止露底 */
+  position: fixed; /* ✅ 固定定位，防止地址栏影响 */
+  overscroll-behavior: none;
+}
+
+html {
+  background-color: #000; /* ✅ 纯黑保底 */
+}
+
+body {
+  background: transparent;
+  color: #fff;
+}
+
+/* ========= 背景图像层：关键优化 ========= */
 #bg-layer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
+  width: 100dvw; /* ✅ 使用动态视口单位 */
   height: 100vh;
-  /* ✅ 关键修改：cover 确保完全填充，不留黑边 */
+  height: 100dvh; /* ✅ iOS 15+ 支持，解决地址栏问题 */
+  
+  /* ✅ 关键：确保图片完全覆盖，允许裁切 */
   object-fit: cover;
   object-position: center center;
+  
   z-index: -1;
   pointer-events: none;
   user-select: none;
-  /* ✅ 新增：防止图片底部出现细微间隙 */
   display: block;
-}
-
-/* ========= HTML 根元素背景保底 ========= */
-html {
-  margin: 0;
-  padding: 0;
-  /* ✅ 背景色作为保底，防止图片加载延迟时露黑 */
-  background-color: #1a1a2e;
-  /* ✅ 防止过度滚动显示白色背景 */
-  overscroll-behavior: none;
-}
-
-/* ========= Body 布局 ========= */
-body {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  color: #fff;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
-  /* ✅ 确保 body 最小高度覆盖整个视口 */
-  min-height: 100vh;
-  min-height: calc(var(--vh, 1vh) * 100);
-}
-
-/* ========= 主屏容器 ========= */
-#homescreen {
-  /* ✅ 修改1：使用 100vh 而不是 100vh + safe-bottom */
-  min-height: 100vh;
-  min-height: calc(var(--vh, 1vh) * 100);
-  box-sizing: border-box;
   
-  /* ✅ 修改2：安全区用 padding 而不是增加高度 */
-  padding-top: max(var(--safe-top), 20px);
-  padding-bottom: max(var(--safe-bottom), 20px);
+  /* ✅ 额外保险：稍微放大防止边缘露底 */
+  transform: scale(1.01);
+}
+
+/* ========= 主屏容器：改用固定高度 ========= */
+#homescreen {
+  position: fixed; /* ✅ 改为固定定位 */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* ✅ 动态视口 */
+  
+  /* ✅ 使用 padding 处理安全区，不改变高度 */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   
@@ -73,8 +82,7 @@ body {
   align-items: center;
   flex-direction: column;
   
-  /* ✅ 新增：防止内容溢出时背景不跟随 */
-  position: relative;
+  overflow: hidden; /* ✅ 防止内容溢出 */
 }
 
 /* ========= App 网格 ========= */
@@ -84,8 +92,6 @@ body {
   grid-gap: 24px 16px;
   justify-content: center;
   align-content: center;
-  /* ✅ 新增：确保网格不会被底部截断 */
-  margin: auto 0;
 }
 
 .app-icon {
@@ -93,7 +99,6 @@ body {
   color: #fff;
   user-select: none;
   cursor: pointer;
-  /* ✅ 新增：点击反馈 */
   transition: transform 0.1s ease;
 }
 
@@ -107,7 +112,6 @@ body {
   border-radius: 20%;
   backdrop-filter: blur(5px);
   background: rgba(255, 255, 255, 0.1);
-  /* ✅ 新增：防止图片底部间隙 */
   display: block;
   margin: 0 auto;
 }
@@ -134,7 +138,6 @@ body {
   backdrop-filter: blur(8px);
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
-  /* ✅ 新增：防止按钮被内容遮挡 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -151,7 +154,12 @@ body.light #theme-toggle {
 /* ========= App 页面容器 ========= */
 #app-container {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  
   display: none;
   background: rgba(0, 0, 0, 0.9);
   overflow-y: auto;
@@ -162,35 +170,38 @@ body.light #theme-toggle {
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   
-  /* ✅ 新增：确保容器完全覆盖 */
   z-index: 100;
 }
 
-/* ========= iOS 专用修复 ========= */
-@supports (-webkit-touch-callout: none) {
-  /* iOS Safari 专用 */
-  body {
-    /* ✅ 防止地址栏收起时出现白边 */
-    min-height: -webkit-fill-available;
+/* ========= 浅色主题 ========= */
+body.light #bg-layer {
+  /* 可以在这里调整浅色模式的背景 */
+}
+
+/* ========= iOS 专用修复（降级方案） ========= */
+@supports not (height: 100dvh) {
+  /* 不支持 dvh 的旧浏览器 */
+  #bg-layer {
+    height: calc(var(--vh, 1vh) * 100);
+    /* ✅ 额外增加高度防止露底 */
+    min-height: calc(var(--vh, 1vh) * 100 + 50px);
   }
   
   #homescreen {
-    min-height: -webkit-fill-available;
+    height: calc(var(--vh, 1vh) * 100);
   }
   
-  #bg-layer {
-    /* ✅ 背景图片稍微超出视口，防止滚动露底 */
-    height: calc(100vh + 1px);
+  #app-container {
+    height: calc(var(--vh, 1vh) * 100);
   }
 }
 
-/* ========= 深色/浅色主题优化 ========= */
-body.light {
-  background-color: #f0f0f5;
-}
-
-/* ========= 加载状态优化 ========= */
-#bg-layer[src=""] {
-  /* 图片未加载时显示渐变背景 */
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+/* ========= 横屏优化 ========= */
+@media (orientation: landscape) {
+  #bg-layer {
+    /* 横屏时确保宽度覆盖 */
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+  }
 }
