@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <!-- 🍎 iOS 全屏与状态栏 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="rgba(0,0,0,0)">
@@ -14,7 +13,7 @@
   <link rel="icon" href="assets/icons/icon512.png" type="image/png">
 
   <style>
-  /* ============ 全局与背景 ============ */
+  /* === 基础与背景 === */
   html, body {
     margin: 0;
     padding: 0;
@@ -22,7 +21,6 @@
     width: 100%;
     overflow: hidden;
     background: #000;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
   }
 
   #bg-layer {
@@ -31,13 +29,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: -1;
+    z-index: -2;
   }
 
   #theme-toggle {
     position: fixed;
-    top: 10px;
-    right: 15px;
+    top: calc(env(safe-area-inset-top) + 8px);
+    right: 14px;
     z-index: 10;
     background: rgba(255,255,255,0.25);
     backdrop-filter: blur(8px);
@@ -46,72 +44,72 @@
     width: 36px;
     height: 36px;
     font-size: 20px;
-    line-height: 36px;
   }
 
-  /* ============ 页面容器 ============ */
+  /* === 页面容器：双页结构 === */
   #container {
     display: flex;
     width: 200%;
     height: 100%;
     transition: transform 0.4s ease;
   }
-
   .page {
     width: 50%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 110px);
+  }
+  #container.swiped {
+    transform: translateX(-50%);
   }
 
-  /* ============ 主屏图标网格 ============ */
+  /* === 图标网格 === */
   .app-grid {
     display: grid;
     grid-template-columns: repeat(3, 90px);
-    grid-gap: 28px;
+    grid-gap: 26px;
     justify-content: center;
     align-content: center;
   }
 
   .app-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 90px;
-    height: 90px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.08);
-    text-align: center;
-    transition: transform 0.2s;
+    justify-content: center;
+    transition: transform 0.2s ease;
   }
-
   .app-icon img {
-    width: 42px;
-    height: 42px;
-    margin-top: 12px;
+    width: 46px;
+    height: 46px;
   }
-
   .app-icon p {
     color: #fff;
     font-size: 14px;
-    margin: 6px 0 0;
+    margin-top: 6px;
+    font-weight: 400;
   }
-
   .app-icon:active {
-    transform: scale(0.94);
+    transform: scale(0.93);
   }
 
-  /* ============ Dock 栏 ============ */
+  /* === Dock 栏 === */
   #dock {
     position: fixed;
-    bottom: 30px;
+    bottom: calc(env(safe-area-inset-bottom) + 20px);
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
     height: 70px;
-    background: rgba(255,255,255,0.18);
-    backdrop-filter: blur(18px);
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(20px);
     border-radius: 25px;
     display: flex;
     justify-content: space-around;
@@ -120,29 +118,19 @@
   }
 
   .dock-item {
-    width: 60px;
-    height: 60px;
-    border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #fff;
   }
-
   .dock-item img {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
   }
-
   .dock-item p {
+    color: #fff;
     font-size: 12px;
-    margin: 3px 0 0;
-  }
-
-  /* 滑动切换样式 */
-  #container.swiped {
-    transform: translateX(-50%);
+    margin-top: 4px;
   }
   </style>
 </head>
@@ -177,18 +165,16 @@
     <div class="dock-item" data-app="settings"><img src="assets/icons/settings.png"><p>设置</p></div>
   </div>
 
-  <!-- App 容器 -->
   <section id="app-container" style="display:none;"></section>
 
   <script>
   let startX = 0;
   const container = document.getElementById('container');
-
   window.addEventListener('touchstart', e => startX = e.touches[0].clientX);
   window.addEventListener('touchend', e => {
-    let endX = e.changedTouches[0].clientX;
-    if (startX - endX > 80) container.classList.add('swiped'); // 右滑到塔罗页
-    if (endX - startX > 80) container.classList.remove('swiped'); // 左滑返回主屏
+    const endX = e.changedTouches[0].clientX;
+    if (startX - endX > 80) container.classList.add('swiped');
+    if (endX - startX > 80) container.classList.remove('swiped');
   });
   </script>
 </body>
