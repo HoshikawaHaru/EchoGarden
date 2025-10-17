@@ -1,38 +1,141 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <!-- 🍎 iOS 全屏与状态栏 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <!-- 改这里 -->
-  <meta name="theme-color" content="rgba(0,0,0,0)">
-  <title>Echo Garden</title>
+<meta charset="UTF-8" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="rgba(0,0,0,0)">
+<title>Echo Garden</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: url('assets/bg/night.jpeg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
 
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
-  <link rel="icon" href="assets/icons/icon512.png" type="image/png">
-  <script src="js/main.js" defer></script>
+/* === 容器：主屏 + 右滑页 === */
+#container {
+  display: flex;
+  width: 200%;
+  height: 100vh;
+  transition: transform 0.4s ease;
+}
+.page {
+  width: 50%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === 主屏图标布局 === */
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  grid-gap: 25px;
+}
+.app {
+  width: 90px;
+  height: 90px;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* === 滑动动画 === */
+#container.swiped {
+  transform: translateX(-50%);
+}
+
+/* === Dock 栏 === */
+#dock {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 70px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.dock-item {
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* 防止点击穿透 */
+#dock, .dock-item {
+  z-index: 100;
+}
+</style>
 </head>
 
 <body>
-  <img id="bg-layer" src="assets/bg/night.jpeg" alt="background">
-  <button id="theme-toggle" aria-label="切换主题">🌗</button>
+  <div id="container">
+    <!-- 首页 -->
+    <section class="page" id="home">
+      <div class="app-grid">
+        <div class="app">消息</div>
+        <div class="app">日记</div>
+        <div class="app">论坛</div>
+        <div class="app">单词</div>
+        <div class="app">心声</div>
+        <div class="app">设置</div>
+      </div>
+    </section>
 
-  <!-- 主屏 -->
-  <main id="homescreen">
-    <div class="app-grid">
-      <div class="app-icon" data-app="message"><img src="assets/icons/message.png"><p>消息</p></div>
-      <div class="app-icon" data-app="diary"><img src="assets/icons/diary.png"><p>日记</p></div>
-      <div class="app-icon" data-app="tarot"><img src="assets/icons/tarot.png"><p>塔罗</p></div>
-      <div class="app-icon" data-app="forum"><img src="assets/icons/forum.png"><p>论坛</p></div>
-      <div class="app-icon" data-app="words"><img src="assets/icons/words.png"><p>单词</p></div>
-      <div class="app-icon" data-app="memo"><img src="assets/icons/memo.png"><p>心声</p></div>
-      <div class="app-icon" data-app="settings"><img src="assets/icons/settings.png"><p>设置</p></div>
-    </div>
-  </main>
+    <!-- 右滑页（塔罗） -->
+    <section class="page" id="right">
+      <div class="app-grid">
+        <div class="app">塔罗</div>
+      </div>
+    </section>
+  </div>
 
-  <section id="app-container" style="display:none;"></section>
+  <!-- Dock 栏 -->
+  <div id="dock">
+    <div class="dock-item">消息</div>
+    <div class="dock-item">设置</div>
+  </div>
+
+  <script>
+  let startX = 0;
+  const container = document.getElementById('container');
+
+  window.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  window.addEventListener('touchend', e => {
+    let endX = e.changedTouches[0].clientX;
+    if (startX - endX > 80) container.classList.add('swiped');   // 右滑到塔罗页
+    if (endX - startX > 80) container.classList.remove('swiped'); // 左滑回主屏
+  });
+  </script>
 </body>
 </html>
