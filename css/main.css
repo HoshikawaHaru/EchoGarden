@@ -50,7 +50,7 @@ html::after {
   left: 0;
   right: 0;
   bottom: 0;
-  height: env(safe-area-inset-bottom, 20px);  /* 
+  height: env(safe-area-inset-bottom, 20px);  
   background-image: var(--bg-image, url('assets/bg/night.jpeg'));
   background-repeat: no-repeat;
   background-size: 100% auto;
