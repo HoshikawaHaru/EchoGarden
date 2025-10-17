@@ -14,16 +14,199 @@
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
   <link rel="icon" href="assets/icons/icon512.png" type="image/png">
   <script src="js/main.js" defer></script>
+
 </head>
 
 <body>
   <img id="bg-layer" src="assets/bg/night.jpeg" alt="background">
   <button id="theme-toggle" aria-label="切换主题">🌗</button>
+  
+<!-- === 信息组件（上下分区 + 柔光玻璃） === -->
+<div id="widget-dock">
+  <div class="widget-card">
 
+    <!-- 顶部：电量区（左圆环 + 右胶囊条） -->
+    <div class="row top">
+      <!-- 左：圆形进度环 -->
+      <div class="ring">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="bg" cx="28" cy="28" r="24"></circle>
+          <circle class="fg" cx="28" cy="28" r="24"></circle>
+        </svg>
+        <span class="pct" id="batt-pct">--%</span>
+      </div>
+
+      <!-- 右：胶囊条 -->
+      <div class="pill">
+        <span class="label">Battery</span>
+        <strong id="batt-text">--%</strong>
+      </div>
+    </div>
+
+    <!-- 底部：信息区（左图/中两行/右时间） -->
+    <div class="row bottom">
+      <img id="profile-img" class="avatar" src="assets/icons/sample.png" alt="avatar" />
+      <div class="center">
+        <div id="custom-text">Daily🤍 ✧˚⋆</div>
+        <div class="sub"><span id="date"></span> · <span id="weekday"></span></div>
+      </div>
+      <div class="time" id="time">--:--</div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* 关键：让主屏成为定位参考容器 */
+#homescreen { position: relative; }
+
+/* 停靠区：整体位置（可按需微调 top） */
+#widget-dock{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  top: calc(env(safe-area-inset-top) + 120px); /* 置于你标红那块 */
+  width:min(88vw, 360px);
+  z-index:10;
+}
+
+/* 外卡片：柔光玻璃 */
+.widget-card{
+  padding:14px 16px;
+  border-radius:28px;
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+  color:#fff;
+  font-family:"SF Pro Display","PingFang SC",sans-serif;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* 通用行 */
+.row{ display:flex; align-items:center; justify-content:space-between; }
+
+/* 顶部行样式 */
+.row.top{
+  background: rgba(255,255,255,0.20);
+  border-radius:20px;
+  padding:8px 10px;
+  gap:12px;
+}
+
+/* 圆环 */
+.ring{ position:relative; width:56px; height:56px; }
+.ring svg{ transform:rotate(-90deg); }
+.ring .bg{ fill:none; stroke:rgba(255,255,255,0.25); stroke-width:4; }
+.ring .fg{
+  fill:none; stroke:#fff; stroke-width:4; stroke-linecap:round;
+  stroke-dasharray: 150; stroke-dashoffset: 150; /* 由JS控制 */
+  transition: stroke-dashoffset .5s ease;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+}
+.ring .pct{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600; text-shadow:0 0 6px rgba(255,255,255,.45);
+}
+
+/* 胶囊条 */
+.pill{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 14px;
+  border-radius:16px;
+  background: rgba(255,255,255,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.pill .label{ font-size:13px; opacity:.9; }
+.pill strong{ font-size:15px; }
+
+/* 底部行 */
+.row.bottom{
+  background: rgba(255,255,255,0.16);
+  border-radius:22px;
+  padding:10px 12px;
+  gap:12px;
+}
+.avatar{
+  width:48px; height:48px; border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(255,255,255,0.38);
+  box-shadow:0 0 10px rgba(255,255,255,0.24);
+}
+.center{ flex:1; min-width:0; }
+#custom-text{ font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sub{ margin-top:3px; font-size:13px; opacity:.9; }
+.time{ font-size:24px; font-weight:700; }
+</style>
+
+<script>
+/* ---------- 日期时间 ---------- */
+function updateTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById("time").textContent = `${hours}:${minutes}`;
+  
+  // 刷新后，继续更新下一帧
+  requestAnimationFrame(updateTime);
+}
+
+// 页面加载时开始更新
+updateTime();
+
+  document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    updateTime();  // 页面变为可见时，手动刷新一次
+  }
+});
+
+
+/* ---------- 电量：多方案兼容 ---------- */
+function setBattery(level){
+  level = Math.max(0, Math.min(100, Math.round(level)));
+  const dash = 150 - (150*level)/100;
+  const fg = document.querySelector('.ring .fg');
+  if (fg) fg.style.strokeDashoffset = dash;
+  const txt = `${level}%`;
+  const el1 = document.getElementById('batt-pct');
+  const el2 = document.getElementById('batt-text');
+  if (el1) el1.textContent = txt;
+  if (el2) el2.textContent = txt;
+  localStorage.setItem('batteryFallback', String(level)); // 记住一次
+}
+
+// 1) 标准 Battery API（iOS 不支持）
+if (navigator.getBattery) {
+  navigator.getBattery().then(b => {
+    const sync = () => setBattery(b.level*100);
+    sync(); b.addEventListener('levelchange', sync);
+  });
+} else {
+  // 2) URL 传参（配合 iOS 快捷指令可自动注入，如 ?battery=71）
+  const u = new URL(location.href);
+  const q = u.searchParams.get('battery');
+  if (q) setBattery(Number(q));
+  else {
+    // 3) 本地记忆/手动兜底
+    const saved = Number(localStorage.getItem('batteryFallback'));
+    if (!isNaN(saved)) setBattery(saved);
+    else setBattery(100); // 初次给个满电占位
+  }
+}
+</script>
+
+  
   <!-- 主屏 -->
   <main id="homescreen">
     <div class="app-grid">
-      <div class="app-icon" data-app="message"><img src="assets/icons/message.png"><p>消息</p></div>
+      <div class="app-icon" id="app-message" data-app="message">
+  <img src="assets/icons/message.png" alt="消息">
+  <p>消息</p>
+</div>
       <div class="app-icon" data-app="diary"><img src="assets/icons/diary.png"><p>日记</p></div>
       <div class="app-icon" data-app="tarot"><img src="assets/icons/tarot.png"><p>塔罗</p></div>
       <div class="app-icon" data-app="forum"><img src="assets/icons/forum.png"><p>论坛</p></div>
@@ -34,5 +217,27 @@
   </main>
 
   <section id="app-container" style="display:none;"></section>
+  
+<script src="js/script.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
