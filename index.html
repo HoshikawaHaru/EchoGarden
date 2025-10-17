@@ -218,23 +218,10 @@ if (navigator.getBattery) {
 
   <section id="app-container" style="display:none;"></section>
   
-  <script>
-  function updateTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById("time").textContent = `${hours}:${minutes}`;
-  }
-
-  // 页面加载时立即更新一次
-  updateTime();
-
-  // 每秒自动更新
-  setInterval(updateTime, 1000);
-</script>
 <script src="js/script.js"></script>
 </body>
 </html>
+
 
 
 
