@@ -1,56 +1,518 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <!-- 🍎 iOS 全屏与状态栏 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="rgba(0,0,0,0)">
-  <title>消息</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>消息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ededed;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: calc(44px + var(--safe-top));
+            padding-top: var(--safe-top);
+            background: #f7f7f7;
+            border-bottom: 0.5px solid #d9d9d9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 16px;
+            padding-right: 16px;
+            z-index: 100;
+        }
+
+        .navbar-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar-icon {
+            font-size: 22px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* 聊天列表 */
+        .chat-list {
+            margin-top: calc(44px + var(--safe-top));
+            padding-bottom: calc(50px + var(--safe-bottom));
+        }
+
+        .chat-item {
+            background: #fff;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 0.5px solid #e5e5e5;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .chat-item:active {
+            background: #ececec;
+        }
+
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .chat-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 底部标签栏 */
+        .tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(50px + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom);
+            background: #f7f7f7;
+            border-top: 0.5px solid #d9d9d9;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .tab-item.active .tab-label {
+            color: #07c160;
+        }
+
+        .tab-badge {
+            position: absolute;
+            top: 6px;
+            right: calc(50% - 20px);
+            background: #fa5151;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        /* 添加角色弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 0.5px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 16px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .avatar-upload {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 2px dashed #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-upload input {
+            display: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #07c160;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-primary:active {
+            background: #06ad56;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
-  <div id="message-page">
-    <header class="top-bar">
-      <button id="back-home">🏠</button>
-      <h1>消息</h1>
-      <button id="add-char">➕</button>
-    </header>
+    <!-- 顶部导航 -->
+    <div class="navbar">
+        <div class="navbar-title">消息</div>
+        <div class="navbar-right">
+            <div class="navbar-icon" id="addBtn">➕</div>
+        </div>
+    </div>
 
-    <main id="tab-content">
-      <section id="tab-chat" class="tab active">
-        <ul id="char-list">
-          <li class="char-item">
-            <img src="assets/avatar/qinche.png" class="avatar">
-            <div class="char-info">
-              <p class="char-name">Nash</p>
-              <p class="char-preview">“晚安，别太晚睡。”</p>
+    <!-- 聊天列表 -->
+    <div class="chat-list" id="chatList">
+        <!-- 预设角色：Nash -->
+        <div class="chat-item" data-character="nash">
+            <div class="chat-avatar">🦊</div>
+            <div class="chat-content">
+                <div class="chat-header">
+                    <div class="chat-name">Nash</div>
+                    <div class="chat-time">12:00</div>
+                </div>
+                <div class="chat-preview">天真开朗的小狐狸</div>
             </div>
-          </li>
-        </ul>
-      </section>
+        </div>
+    </div>
 
-      <section id="tab-moments" class="tab">朋友圈内容（即将开放）</section>
-      <section id="tab-timer" class="tab">计时器内容（即将开放）</section>
-      <section id="tab-user" class="tab">我（上传头像、人设等）</section>
-    </main>
+    <!-- 底部标签栏 -->
+    <div class="tabbar">
+        <div class="tab-item active">
+            <div class="tab-icon">💬</div>
+            <div class="tab-label">聊天</div>
+            <div class="tab-badge">1</div>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">📅</div>
+            <div class="tab-label">事件</div>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">🌐</div>
+            <div class="tab-label">朋友圈</div>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">我</div>
+        </div>
+    </div>
 
-    <nav class="bottom-tab">
-  <button class="tab-btn active" data-target="tab-chat">
-    💬<span>聊天</span>
-  </button>
-  <button class="tab-btn" data-target="tab-moments">
-    🌸<span>发现</span>
-  </button>
-  <button class="tab-btn" data-target="tab-timer">
-    ⏰<span>计时</span>
-  </button>
-  <button class="tab-btn" data-target="tab-user">
-    👤<span>我</span>
-  </button>
-</nav>
-  </div>
+    <!-- 添加角色弹窗 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">添加角色</div>
+                <div class="modal-close" id="closeModal">×</div>
+            </div>
+            <div class="modal-body">
+                <form id="characterForm">
+                    <div class="form-group">
+                        <label class="form-label">头像</label>
+                        <div class="avatar-upload" id="avatarUpload">
+                            <span>📷</span>
+                            <input type="file" id="avatarInput" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">姓名</label>
+                        <input type="text" class="form-input" id="characterName" placeholder="输入角色姓名" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">昵称</label>
+                        <input type="text" class="form-input" id="characterNickname" placeholder="输入角色昵称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">人设</label>
+                        <textarea class="form-textarea" id="characterBio" placeholder="描述角色的性格、特点..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">添加</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-  <script src="js/script.js"></script>
+    <script>
+        // 角色数据存储
+        let characters = [
+            {
+                id: 'nash',
+                name: 'Nash',
+                nickname: 'Nash',
+                bio: '天真开朗的小狐狸',
+                avatar: '🦊',
+                lastMessage: '天真开朗的小狐狸',
+                lastTime: '12:00'
+            }
+        ];
+
+        // 模态框控制
+        const addBtn = document.getElementById('addBtn');
+        const addModal = document.getElementById('addModal');
+        const closeModal = document.getElementById('closeModal');
+        const characterForm = document.getElementById('characterForm');
+        const avatarUpload = document.getElementById('avatarUpload');
+        const avatarInput = document.getElementById('avatarInput');
+
+        addBtn.addEventListener('click', () => {
+            addModal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            addModal.classList.remove('show');
+        });
+
+        addModal.addEventListener('click', (e) => {
+            if (e.target === addModal) {
+                addModal.classList.remove('show');
+            }
+        });
+
+        // 头像上传
+        avatarUpload.addEventListener('click', () => {
+            avatarInput.click();
+        });
+
+        avatarInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    avatarUpload.innerHTML = `<img src="${e.target.result}" alt="avatar">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 添加角色
+        characterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('characterName').value;
+            const nickname = document.getElementById('characterNickname').value;
+            const bio = document.getElementById('characterBio').value;
+            const avatarImg = avatarUpload.querySelector('img');
+            const avatar = avatarImg ? avatarImg.src : '👤';
+
+            const newCharacter = {
+                id: Date.now().toString(),
+                name,
+                nickname: nickname || name,
+                bio,
+                avatar,
+                lastMessage: bio,
+                lastTime: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            characters.push(newCharacter);
+            renderChatList();
+            
+            addModal.classList.remove('show');
+            characterForm.reset();
+            avatarUpload.innerHTML = '<span>📷</span>';
+        });
+
+        // 渲染聊天列表
+        function renderChatList() {
+            const chatList = document.getElementById('chatList');
+            chatList.innerHTML = characters.map(char => `
+                <div class="chat-item" data-character="${char.id}">
+                    <div class="chat-avatar">
+                        ${char.avatar.startsWith('data:') || char.avatar.startsWith('http') 
+                            ? `<img src="${char.avatar}" alt="${char.name}">` 
+                            : char.avatar}
+                    </div>
+                    <div class="chat-content">
+                        <div class="chat-header">
+                            <div class="chat-name">${char.nickname}</div>
+                            <div class="chat-time">${char.lastTime}</div>
+                        </div>
+                        <div class="chat-preview">${char.lastMessage}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 添加点击事件
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const characterId = item.dataset.character;
+                    window.location.href = `chat.html?id=${characterId}`;
+                });
+            });
+        }
+
+        // 标签栏切换
+        document.querySelectorAll('.tab-item').forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                if (index !== 0) {
+                    alert('该功能暂未开发');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
