@@ -36,10 +36,10 @@
 
         #bg-layer {
             position: fixed;
-            top: -10px;
-            left: -10px;
-            width: calc(100vw + 20px);
-            height: calc(100vh + 20px);
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             object-fit: cover;
             object-position: center center;
             z-index: -1;
@@ -48,13 +48,9 @@
         }
 
         html {
-            background-image: var(--bg-image, url('assets/bg/night.jpeg'));
-            background-size: 100% auto;
-            background-position: center top;
-            background-repeat: no-repeat;
-            background-color: #000;
             overflow: hidden;
             touch-action: pan-x;
+            background: #000;
             min-height: 100vh;
         }
 
