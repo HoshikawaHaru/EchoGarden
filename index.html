@@ -17,15 +17,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html {
-            height: 100%;
-            overflow: hidden;
+        :root {
+            --vh: 1vh;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+            --bg-image: url('assets/bg/night.jpeg');
         }
 
-        body {
-            height: 100%;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        html {
+            background-image: var(--bg-image, url('assets/bg/night.jpeg'));
+            background-size: 100% auto;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-color: #000;
         }
 
         #bg-layer {
@@ -35,67 +41,86 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
+            object-position: center center;
             z-index: -1;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+            padding-bottom: env(safe-area-inset-bottom, 0);
         }
 
         #theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            font-size: 24px;
-            cursor: pointer;
+            position: fixed;
+            top: calc(12px + var(--safe-top));
+            right: calc(12px + var(--safe-right));
             z-index: 100;
-            transition: transform 0.2s;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: background .3s ease, transform .2s ease;
         }
 
         #theme-toggle:active {
-            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0.95);
         }
 
         /* 滑动容器 */
         #swipe-wrapper {
-            width: 100vw;
-            height: 100vh;
+            min-height: calc(var(--vh) * 100 + var(--safe-bottom));
             overflow: hidden;
             position: relative;
         }
 
         #swipe-container {
             width: 200vw;
-            height: 100vh;
+            height: calc(var(--vh) * 100);
             display: flex;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .page {
             width: 100vw;
-            height: 100vh;
+            height: calc(var(--vh) * 100);
             flex-shrink: 0;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding-top: var(--safe-top);
+            padding-bottom: calc(var(--safe-bottom) + 140px);
+            padding-left: var(--safe-left);
+            padding-right: var(--safe-right);
         }
 
         /* App 网格布局 */
         .app-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
+            grid-template-columns: repeat(4, 80px);
+            grid-gap: 24px 16px;
+            justify-content: center;
+            align-content: center;
         }
 
         .app-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            text-align: center;
+            color: #fff;
+            user-select: none;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -105,23 +130,23 @@
         }
 
         .app-icon img {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            margin-bottom: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 60px;
+            height: 60px;
+            border-radius: 20%;
+            backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .app-icon p {
-            font-size: 13px;
-            color: white;
+            font-size: 11px;
+            margin-top: 4px;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         /* Dock 栏样式 */
         #dock {
             position: fixed;
-            bottom: 20px;
+            bottom: calc(20px + var(--safe-bottom));
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -136,15 +161,10 @@
             z-index: 1000;
         }
 
-        #dock .app-icon {
-            margin: 0;
-        }
-
         #dock .app-icon img {
             width: 60px;
             height: 60px;
             border-radius: 14px;
-            margin-bottom: 0;
         }
 
         #dock .app-icon p {
@@ -154,7 +174,7 @@
         /* 页面指示器 */
         .page-indicators {
             position: fixed;
-            bottom: 110px;
+            bottom: calc(110px + var(--safe-bottom));
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -241,10 +261,15 @@
     <section id="app-container" style="display:none;"></section>
 
     <script>
-        // 防止滚动
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-        
+        // 计算真实视口高度（原版代码）
+        function setVh() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        setVh();
+        window.addEventListener('resize', setVh);
+        window.addEventListener('orientationchange', setVh);
+
         // 滑动逻辑
         const swipeContainer = document.getElementById('swipe-container');
         const indicators = document.querySelectorAll('.page-indicator');
@@ -270,12 +295,11 @@
 
         swipeContainer.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            e.preventDefault();
             currentX = e.touches[0].clientX;
             const diff = currentX - startX;
             const offset = -currentPage * 100 + (diff / window.innerWidth) * 100;
             swipeContainer.style.transform = `translateX(${offset}vw)`;
-        }, { passive: false });
+        });
 
         swipeContainer.addEventListener('touchend', (e) => {
             if (!isDragging) return;
@@ -303,7 +327,9 @@
 
         themeToggle.addEventListener('click', () => {
             isDarkTheme = !isDarkTheme;
-            bgLayer.src = isDarkTheme ? 'assets/bg/night.jpeg' : 'assets/bg/day.jpeg';
+            const newBg = isDarkTheme ? 'assets/bg/night.jpeg' : 'assets/bg/day.jpeg';
+            bgLayer.src = newBg;
+            document.documentElement.style.setProperty('--bg-image', `url('${newBg}')`);
             themeToggle.textContent = isDarkTheme ? '🌙' : '☀️';
         });
 
@@ -314,13 +340,6 @@
                 console.log('打开应用:', appName);
             });
         });
-
-        // 防止iOS下拉刷新
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
     </script>
 </body>
 </html>
