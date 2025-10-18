@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
@@ -17,37 +17,30 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
-            width: 100%;
+        html {
             height: 100%;
             overflow: hidden;
-            position: fixed;
-            background: #000; /* ★修改点：避免底部露出默认白色 */
-            overscroll-behavior: none; /* ★修改点：避免回弹露底 */
         }
 
         body {
+            height: 100%;
+            overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-   /* 修复底部白/黑边：向下多铺安全区 + 1px，避免 iOS 取整缝隙 */
-#bg-layer {
-  position: fixed;
-  top: -1px;                                 /* 上边也向外扩 1px 兜底 */
-  left: 0;
-  right: 0;
-  bottom: calc(-1px - env(safe-area-inset-bottom));  /* 关键：覆盖到安全区以下再多 1px */
-  width: 100%;
-  height: auto;                               /* 由 top/bottom 决定高度 */
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none;
-}
-
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+        }
 
         #theme-toggle {
-            position: fixed;
-            top: calc(env(safe-area-inset-top) + 20px);
+            position: absolute;
+            top: 20px;
             right: 20px;
             width: 50px;
             height: 50px;
@@ -60,28 +53,36 @@
             z-index: 100;
             transition: transform 0.2s;
         }
-        #theme-toggle:active { transform: scale(0.9); }
+
+        #theme-toggle:active {
+            transform: scale(0.9);
+        }
 
         /* 滑动容器 */
+        #swipe-wrapper {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
         #swipe-container {
             width: 200vw;
-            height: calc(var(--vh, 1vh) * 100);  /* ★修改点 */
+            height: 100vh;
             display: flex;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
         }
 
         .page {
             width: 100vw;
-            min-height: calc(var(--vh, 1vh) * 100); /* ★修改点：防止比视口短 */
+            height: 100vh;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-bottom: 140px;
         }
 
-        /* App 网格布局（原样） */
+        /* App 网格布局 */
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -90,15 +91,37 @@
             max-width: 500px;
             margin: 0 auto;
         }
-        .app-icon { display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform .2s; }
-        .app-icon:active { transform: scale(0.9); }
-        .app-icon img { width:70px; height:70px; border-radius:16px; margin-bottom:8px; box-shadow:0 4px 12px rgba(0,0,0,.15); }
-        .app-icon p { font-size:13px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); }
 
-        /* Dock 栏样式（原样） */
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .app-icon:active {
+            transform: scale(0.9);
+        }
+
+        .app-icon img {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .app-icon p {
+            font-size: 13px;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dock 栏样式 */
         #dock {
             position: fixed;
-            bottom: calc(env(safe-area-inset-bottom) + 20px);
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -108,33 +131,53 @@
             backdrop-filter: blur(30px) saturate(180%);
             -webkit-backdrop-filter: blur(30px) saturate(180%);
             border-radius: 22px;
-            box-shadow: 0 8px 32px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
             z-index: 1000;
         }
-        #dock .app-icon { margin:0; }
-        #dock .app-icon img { width:60px; height:60px; border-radius:14px; margin-bottom:0; }
-        #dock .app-icon p { display:none; }
 
-        /* 页面指示器（原样） */
+        #dock .app-icon {
+            margin: 0;
+        }
+
+        #dock .app-icon img {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            margin-bottom: 0;
+        }
+
+        #dock .app-icon p {
+            display: none;
+        }
+
+        /* 页面指示器 */
         .page-indicators {
             position: fixed;
-            bottom: calc(env(safe-area-inset-bottom) + 110px);
+            bottom: 110px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 8px;
             z-index: 999;
         }
-        .page-indicator { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); transition:all .3s; }
-        .page-indicator.active { background: rgba(255,255,255,.9); width:24px; border-radius:4px; }
 
-        #app-container { display:none; }
+        .page-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
 
-        /* ★修改点：支持时优先用 100dvh（iOS 16+ 更稳） */
-        @supports (height: 100dvh) {
-            #bg-layer { height: 100dvh; }
-            #swipe-container { height: 100dvh; }
-            .page { min-height: 100dvh; }
+        .page-indicator.active {
+            background: rgba(255, 255, 255, 0.9);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        #app-container {
+            display: none;
         }
     </style>
 </head>
@@ -143,35 +186,37 @@
     <button id="theme-toggle" aria-label="切换主题">🌙</button>
 
     <!-- 滑动容器 -->
-    <div id="swipe-container">
-        <!-- 第一页 -->
-        <div class="page" id="page-1">
-            <div class="app-grid">
-                <div class="app-icon" data-app="diary">
-                    <img src="assets/icons/diary.png" alt="日记">
-                    <p>日记</p>
-                </div>
-                <div class="app-icon" data-app="forum">
-                    <img src="assets/icons/forum.png" alt="论坛">
-                    <p>论坛</p>
-                </div>
-                <div class="app-icon" data-app="words">
-                    <img src="assets/icons/words.png" alt="单词">
-                    <p>单词</p>
-                </div>
-                <div class="app-icon" data-app="memo">
-                    <img src="assets/icons/memo.png" alt="心声">
-                    <p>心声</p>
+    <div id="swipe-wrapper">
+        <div id="swipe-container">
+            <!-- 第一页 -->
+            <div class="page" id="page-1">
+                <div class="app-grid">
+                    <div class="app-icon" data-app="diary">
+                        <img src="assets/icons/diary.png" alt="日记">
+                        <p>日记</p>
+                    </div>
+                    <div class="app-icon" data-app="forum">
+                        <img src="assets/icons/forum.png" alt="论坛">
+                        <p>论坛</p>
+                    </div>
+                    <div class="app-icon" data-app="words">
+                        <img src="assets/icons/words.png" alt="单词">
+                        <p>单词</p>
+                    </div>
+                    <div class="app-icon" data-app="memo">
+                        <img src="assets/icons/memo.png" alt="心声">
+                        <p>心声</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 第二页 -->
-        <div class="page" id="page-2">
-            <div class="app-grid">
-                <div class="app-icon" data-app="tarot">
-                    <img src="assets/icons/tarot.png" alt="塔罗">
-                    <p>塔罗</p>
+            <!-- 第二页 -->
+            <div class="page" id="page-2">
+                <div class="app-grid">
+                    <div class="app-icon" data-app="tarot">
+                        <img src="assets/icons/tarot.png" alt="塔罗">
+                        <p>塔罗</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,70 +241,86 @@
     <section id="app-container" style="display:none;"></section>
 
     <script>
-        /* ★修改点：仅在窗口尺寸变化时计算一次动态视口，无轮询 */
-        const setVH = () => {
-          const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
-          document.documentElement.style.setProperty('--vh', `${vh}px`);
-        };
-        setVH();
-        window.addEventListener('resize', setVH, {passive:true});
-        window.addEventListener('orientationchange', setVH, {passive:true});
-
-        // 滑动逻辑（原样）
+        // 防止滚动
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        
+        // 滑动逻辑
         const swipeContainer = document.getElementById('swipe-container');
         const indicators = document.querySelectorAll('.page-indicator');
-        let currentPage = 0, startX = 0, currentX = 0, isDragging = false;
+        let currentPage = 0;
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
 
         function updatePage(page) {
             currentPage = Math.max(0, Math.min(1, page));
             swipeContainer.style.transform = `translateX(-${currentPage * 100}vw)`;
-            indicators.forEach((ind, idx) => ind.classList.toggle('active', idx === currentPage));
+            
+            indicators.forEach((ind, idx) => {
+                ind.classList.toggle('active', idx === currentPage);
+            });
         }
 
         swipeContainer.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             isDragging = true;
             swipeContainer.style.transition = 'none';
-        }, {passive:true});
+        });
 
         swipeContainer.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
+            e.preventDefault();
             currentX = e.touches[0].clientX;
             const diff = currentX - startX;
             const offset = -currentPage * 100 + (diff / window.innerWidth) * 100;
             swipeContainer.style.transform = `translateX(${offset}vw)`;
-        }, {passive:true});
+        }, { passive: false });
 
-        swipeContainer.addEventListener('touchend', () => {
+        swipeContainer.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
             swipeContainer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            
             const diff = currentX - startX;
             if (Math.abs(diff) > 50) {
-                updatePage(diff < 0 ? currentPage + 1 : currentPage - 1);
+                if (diff < 0 && currentPage < 1) {
+                    updatePage(currentPage + 1);
+                } else if (diff > 0 && currentPage > 0) {
+                    updatePage(currentPage - 1);
+                } else {
+                    updatePage(currentPage);
+                }
             } else {
                 updatePage(currentPage);
             }
-        }, {passive:true});
+        });
 
-        // 主题切换（原样）
+        // 主题切换
         const themeToggle = document.getElementById('theme-toggle');
         const bgLayer = document.getElementById('bg-layer');
         let isDarkTheme = true;
+
         themeToggle.addEventListener('click', () => {
             isDarkTheme = !isDarkTheme;
             bgLayer.src = isDarkTheme ? 'assets/bg/night.jpeg' : 'assets/bg/day.jpeg';
             themeToggle.textContent = isDarkTheme ? '🌙' : '☀️';
         });
 
-        // App 点击事件（原样）
+        // App 点击事件
         document.querySelectorAll('.app-icon').forEach(icon => {
             icon.addEventListener('click', () => {
                 const appName = icon.dataset.app;
                 console.log('打开应用:', appName);
             });
         });
+
+        // 防止iOS下拉刷新
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
-
