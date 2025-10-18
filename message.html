@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="rgba(0,0,0,0)">
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon512.png">
+    <link rel="icon" href="assets/icons/icon512.png" type="image/png">
     <title>消息</title>
     <style>
         * {
@@ -329,7 +332,10 @@
 <body>
     <!-- 顶部导航 -->
     <div class="navbar">
-        <div class="navbar-title">消息</div>
+        <div class="navbar-left">
+            <div class="back-btn" id="backBtn">◀</div>
+            <div class="navbar-title">消息</div>
+        </div>
         <div class="navbar-right">
             <div class="navbar-icon" id="addBtn">➕</div>
         </div>
@@ -406,6 +412,12 @@
     </div>
 
     <script>
+        // 返回按钮
+        const backBtn = document.getElementById('backBtn');
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
         // 角色数据存储
         let characters = [
             {
