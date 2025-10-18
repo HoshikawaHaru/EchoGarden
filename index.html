@@ -367,9 +367,15 @@
                 const appName = icon.dataset.app;
                 console.log('打开应用:', appName);
                 
-                // 如果是消息app，跳转到消息页面
+                // 根据不同的app跳转
                 if (appName === 'message') {
                     window.location.href = 'message.html';
+                } else if (appName === 'diary') {
+                    window.location.href = 'apps/diary.html';
+                } else if (appName === 'settings') {
+                    window.location.href = 'apps/settings.html';
+                } else if (appName === 'tarot') {
+                    window.location.href = 'apps/tarot.html';
                 }
             });
         });
