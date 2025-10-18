@@ -6,20 +6,18 @@ html {
   background-color: #000;
 }
 
-/* 背景层：向四周外扩，特别是底部 + 安全区，彻底吃掉黑/白缝 */
+/* === 背景图像层（使用 <img> 避免 Safari 背景缩放错误） === */
 #bg-layer {
   position: fixed;
-  left: -8px;                     /* 左右上外扩 8px */
-  right: -8px;
-  top: -8px;
-  bottom: calc(-8px - env(safe-area-inset-bottom)); /* 关键：含底部安全区再外扩 */
-  width: calc(100% + 16px);       /* 配合外扩，避免缩放导致空隙 */
-  height: calc(100% + env(safe-area-inset-bottom) + 16px);
-  object-fit: cover;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* 确保背景图片自适应 */
+  object-position: center center;
   z-index: -1;
-  pointer-events: none;
-  will-change: transform;         /* 强制合成层，减少像素取整 */
-  transform: translateZ(0);
+  pointer-events: none;            /* 不影响交互 */
+  user-select: none;
 }
 
 /* ========= 视口与安全区变量 ========= */
