@@ -366,6 +366,11 @@
             icon.addEventListener('click', () => {
                 const appName = icon.dataset.app;
                 console.log('打开应用:', appName);
+                
+                // 如果是消息app，跳转到消息页面
+                if (appName === 'message') {
+                    window.location.href = 'message.html';
+                }
             });
         });
     </script>
