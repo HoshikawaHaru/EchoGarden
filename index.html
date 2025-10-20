@@ -218,7 +218,6 @@
             background: #ededed;
             overflow: hidden;
             z-index: 2000;
-
         }
     </style>
 </head>
@@ -376,19 +375,6 @@
                 const appName = icon.dataset.app;
                 console.log('打开应用:', appName);
                 
-                // 根据不同的app跳转
-                if (appName === 'message') {
-                    window.location.href = 'message.html';
-                } else if (appName === 'diary') {
-                    window.location.href = 'apps/diary.html';
-                } else if (appName === 'settings') {
-                    window.location.href = 'apps/settings.html';
-                } else if (appName === 'tarot') {
-                    window.location.href = 'apps/tarot.html';
-                }
-            });
-        });
-
                 // 动态加载app内容
                 loadApp(appName);
             });
@@ -434,7 +420,6 @@
             appContainer.style.display = 'none';
             appContainer.innerHTML = '';
         };
->>>>>>> test-repo/main
     </script>
 </body>
 </html>
