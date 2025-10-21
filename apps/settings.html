@@ -1,5 +1,199 @@
-<div class="app settings">
-  <button onclick="goHome()">← 返回主屏</button>
-  <h2>⚙️ 设置</h2>
-  <p>这里可以配置角色、字体、背景等。</p>
-</div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>设置</title>
+<style>
+  :root{
+    --safe-top: env(safe-area-inset-top,0px);
+    --safe-bottom: env(safe-area-inset-bottom,0px);
+  }
+  html,body{height:100%;margin:0;}
+  body{background:#f2f2f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#111;}
+  .nav{
+    position:sticky; top:0;
+    padding-top: calc(12px + var(--safe-top));
+    height: calc(44px + 12px + var(--safe-top));
+    background:#f2f2f7; z-index:10;
+    display:flex; align-items:flex-end; justify-content:center;
+    border-bottom:0.5px solid #ddd;
+  }
+  .nav .back{position:absolute; left:12px; bottom:8px; padding:6px 8px; border-radius:10px;}
+  .nav .back:active{background:rgba(0,0,0,.06)}
+  .nav h1{font-size:17px; font-weight:600; margin:0 32px 8px; line-height:20px;}
+  .section-title{margin:16px 16px 8px; font-size:13px; color:#6d6d72}
+  .card{background:#fff; border-radius:12px; margin:0 16px; overflow:hidden; box-shadow:0 1px 0 rgba(0,0,0,.06);}
+  .row{display:flex; align-items:center; padding:12px 16px; border-bottom:0.5px solid #eee;}
+  .row:last-child{border-bottom:none;}
+  .label{width:82px; font-size:15px; color:#111; flex:0 0 82px}
+  .ctrl{flex:1; display:flex; align-items:center; gap:12px}
+  input[type="text"]{
+    width:100%; border:0; background:#f2f2f7; border-radius:10px; padding:10px 12px; font-size:15px; color:#111;
+  }
+  select{
+    width:100%; border:0; background:#f2f2f7; border-radius:10px; padding:10px 12px; font-size:15px; color:#111; appearance:none;
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:34px; padding:0 14px; border-radius:10px; border:0;
+    background:#e9f0ff; color:#1677ff; font-size:14px; font-weight:600; letter-spacing:.2px;
+  }
+  .btn:active{filter:brightness(.95)}
+  .footer{
+    padding:16px; display:flex; gap:12px; position:sticky; bottom:0; background:linear-gradient(to top,#f2f2f7 70%,transparent);
+    padding-bottom: calc(16px + var(--safe-bottom));
+  }
+  .btn-secondary{background:#ededed; color:#222}
+  .btn-primary{background:#34c759; color:#fff}
+  .hint{font-size:13px; color:#6d6d72; margin:12px 16px}
+</style>
+</head>
+<body>
+  <div class="nav">
+    <button class="back" id="backBtn">◀</button>
+    <h1>设置</h1>
+  </div>
+
+  <div class="section-title">主模型（用于聊天/日记/心声）</div>
+  <div class="card">
+    <div class="row">
+      <div class="label">API Key</div>
+      <div class="ctrl"><input id="main_key" type="text" placeholder="sk-…" autocapitalize="off" autocomplete="off" /></div>
+    </div>
+    <div class="row">
+      <div class="label">代理网址</div>
+      <div class="ctrl"><input id="main_base" type="text" placeholder="https://api.example.com/v1" /></div>
+    </div>
+    <div class="row">
+      <div class="label">模型</div>
+      <div class="ctrl">
+        <select id="main_model"><option>(先拉取模型)</option></select>
+        <button class="btn" id="main_fetch">拉取模型</button>
+        <button class="btn" id="main_save">保存</button>
+      </div>
+    </div>
+  </div>
+  <div class="hint">如你的网关兼容 OpenAI 接口，"拉取模型"会尝试请求 /models；若跨域受限，会自动使用本地示例列表。</div>
+
+  <div class="section-title">副模型（用于总结角色短/长期记忆）</div>
+  <div class="card">
+    <div class="row">
+      <div class="label">API Key</div>
+      <div class="ctrl"><input id="sub_key" type="text" placeholder="sk-…" autocapitalize="off" autocomplete="off" /></div>
+    </div>
+    <div class="row">
+      <div class="label">代理网址</div>
+      <div class="ctrl"><input id="sub_base" type="text" placeholder="https://api.example.com/v1" /></div>
+    </div>
+    <div class="row">
+      <div class="label">模型</div>
+      <div class="ctrl">
+        <select id="sub_model"><option>(先拉取模型)</option></select>
+        <button class="btn" id="sub_fetch">拉取模型</button>
+        <button class="btn" id="sub_save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="btn btn-secondary" id="clearAll">清空本地配置</button>
+    <button class="btn" id="toChat">去聊天测试</button>
+  </div>
+
+<script>
+(function(){
+  const LS = {
+    main: 'eg_main_model_cfg',
+    sub:  'eg_sub_model_cfg'
+  };
+  const $ = s => document.querySelector(s);
+
+  function load(key, map){
+    try{
+      const raw = localStorage.getItem(key);
+      if(!raw) return;
+      const cfg = JSON.parse(raw);
+      for(const k in map){ if(cfg[k] != null) map[k].value = cfg[k]; }
+    }catch(e){}
+  }
+  function save(key, map){
+    const cfg = {};
+    for(const k in map){ cfg[k] = map[k].value.trim(); }
+    localStorage.setItem(key, JSON.stringify(cfg));
+    alert('已保存');
+  }
+
+  const mainMap = { apiKey:$('#main_key'), base:$('#main_base'), model:$('#main_model') };
+  const subMap  = { apiKey:$('#sub_key'),  base:$('#sub_base'),  model:$('#sub_model')  };
+
+  load(LS.main, mainMap);
+  load(LS.sub,  subMap);
+
+  $('#main_save').onclick = () => save(LS.main, mainMap);
+  $('#sub_save').onclick  = () => save(LS.sub,  subMap);
+
+  async function fetchModels(base, key){
+    const demo = ['gpt-4o-mini','gpt-4o','gpt-4.1','o3-mini','o3'];
+    try{
+      const url = (base.replace(/\/+$/,'') || '') + '/models';
+      const r = await fetch(url, {headers:{'Authorization':'Bearer '+key}});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j = await r.json();
+      const list = (j.data||[]).map(x=>x.id).filter(Boolean);
+      return list.length ? list.sort() : demo;
+    }catch(e){
+      return demo;
+    }
+  }
+  function fillSelect(sel, arr){
+    sel.innerHTML = arr.map(m=>`<option value="${m}">${m}</option>`).join('');
+  }
+  $('#main_fetch').onclick = async ()=>{
+    const arr = await fetchModels(mainMap.base.value, mainMap.apiKey.value);
+    fillSelect(mainMap.model, arr);
+  };
+  $('#sub_fetch').onclick = async ()=>{
+    const arr = await fetchModels(subMap.base.value, subMap.apiKey.value);
+    fillSelect(subMap.model, arr);
+  };
+
+  // 返回 - 修复：调用主页面的 closeApp
+  $('#backBtn').onclick = function(){
+    if (window.closeApp) {
+      window.closeApp();
+    } else if (window.parent && window.parent.closeApp) {
+      window.parent.closeApp();
+    } else if (history.length > 1) {
+      history.back();
+    } else {
+      location.href = '../index.html';
+    }
+  };
+
+  $('#clearAll').onclick = ()=>{
+    localStorage.removeItem(LS.main);
+    localStorage.removeItem(LS.sub);
+    alert('已清空');
+    location.reload();
+  };
+
+  // 去聊天测试 - 修复：跳转到消息列表
+  $('#toChat').onclick = ()=>{
+    if (window.closeApp) {
+      // 如果是通过 index 打开的，先关闭设置，再打开消息
+      window.closeApp();
+      setTimeout(() => {
+        if (window.parent && window.parent.loadApp) {
+          window.parent.loadApp('message');
+        }
+      }, 100);
+    } else {
+      // 独立打开的，直接跳转
+      location.href = './message.html';
+    }
+  };
+})();
+</script>
+</body>
+</html>
