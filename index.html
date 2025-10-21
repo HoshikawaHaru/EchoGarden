@@ -290,18 +290,6 @@
         window.addEventListener('resize', setVh);
         window.addEventListener('orientationchange', setVh);
 
-        // 禁止所有滚动
-        document.addEventListener('touchmove', function(e) {
-            if (!e.target.closest('#swipe-container')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        // 禁止body滚动
-        document.body.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        }, { passive: false });
-
         // 滑动逻辑
         const swipeContainer = document.getElementById('swipe-container');
         const indicators = document.querySelectorAll('.page-indicator');
@@ -414,12 +402,53 @@
             }
         }
 
-        // 关闭app
-        window.closeApp = function() {
-            const appContainer = document.getElementById('app-container');
-            appContainer.style.display = 'none';
-            appContainer.innerHTML = '';
-        };
+  // 供 app 内部“页面内跳转”用：加载 apps/ 下的另一个页面到同一个容器
+  window.openAppPage = async function (path) {
+    // 支持带查询串：'message-detail.html' 或 'message-detail.html?id=nash'
+    const appContainer = document.getElementById('app-container');
+
+    const [cleanPath, query = ''] = path.split('?');
+    const res = await fetch(`apps/${cleanPath}`);
+    if (!res.ok) throw new Error('page load failed');
+    const html = await res.text();
+
+    appContainer.innerHTML = html;
+
+    // 如果有查询串，存到 dataset 里（子页可读取），或用 sessionStorage 也行
+    appContainer.dataset.query = query;
+
+    // 执行子页内联脚本
+    const scripts = appContainer.querySelectorAll('script');
+    scripts.forEach(s => {
+      const ns = document.createElement('script');
+      ns.textContent = s.textContent;
+      document.body.appendChild(ns);
+      ns.remove();
+    });
+  };
+
+  // 让 app 能滚，首页才拦截滚动
+  const appContainerEl = () => document.getElementById('app-container');
+  const appIsOpen = () => appContainerEl().style.display === 'block';
+
+  // 替换你原来两个 preventDefault 的回调：
+  document.addEventListener('touchmove', function (e) {
+    if (appIsOpen()) return;                 // app 打开时不拦截
+    if (!e.target.closest('#swipe-container')) e.preventDefault();
+  }, { passive: false });
+
+  document.body.addEventListener('touchmove', function (e) {
+    if (appIsOpen()) return;                 // app 打开时不拦截
+    e.preventDefault();
+  }, { passive: false });
+
+  // 关闭 app 时仍然生效
+  window.closeApp = function () {
+    const appContainer = document.getElementById('app-container');
+    appContainer.style.display = 'none';
+    appContainer.innerHTML = '';
+  };
+
     </script>
 </body>
 </html>
