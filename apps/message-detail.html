@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>聊天</title>
+  <link rel="apple-touch-icon" sizes="512x512" href="../assets/icons/icon512.png">
+  <link rel="icon" href="../assets/icons/icon512.png" type="image/png">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    :root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+    html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#ededed}
+
+    /* 顶栏 */
+    .chat-app{position:fixed;inset:0;display:flex;flex-direction:column}
+    .chat-navbar{
+      height:calc(44px + var(--safe-top));
+      padding-top:var(--safe-top);
+      background:#f7f7f7;
+      border-bottom:.5px solid #d9d9d9;
+      display:flex;align-items:center;justify-content:space-between;
+      padding-left:12px;padding-right:12px;flex-shrink:0
+    }
+    .chat-back,.chat-more{width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#111;font-size:22px}
+    .chat-title{position:absolute;left:50%;transform:translateX(-50%);top:calc(10px + var(--safe-top));height:24px;display:flex;align-items:center;font-weight:600;color:#000}
+
+    /* 列表 */
+    .chat-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch; padding:10px 12px 0 12px}
+    .row{display:flex;align-items:flex-end;margin:10px 0;gap:8px}
+    .row.you{justify-content:flex-start}
+    .row.me{justify-content:flex-end}
+    .avatar{width:36px;height:36px;border-radius:6px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .avatar img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+
+    .bubble{
+      max-width:72vw;
+      padding:10px 12px;
+      border-radius:8px;
+      font-size:16px;line-height:1.4;word-break:break-word;
+      box-shadow:0 1px 0 rgba(0,0,0,.05)
+    }
+    .row.you .bubble{background:#fff;color:#111;border:1px solid #eaeaea}
+    .row.me  .bubble{background:#95ec69;color:#111}
+
+    /* 输入区 */
+    .input-bar{
+      background:#f7f7f7;border-top:.5px solid #d9d9d9;flex-shrink:0;
+      padding:8px 10px calc(8px + var(--safe-bottom));
+      display:flex;gap:8px;align-items:center
+    }
+    .ipt{
+      flex:1;background:#fff;border:1px solid #e1e1e1;border-radius:18px;
+      padding:10px 14px;font-size:16px;outline:none
+    }
+    .send{
+      background:#07c160;color:#fff;border:none;border-radius:18px;
+      padding:10px 14px;font-size:15px;cursor:pointer
+    }
+    .send:active{background:#06ad56}
+
+    /* 编辑弹窗（复刻“添加角色”的样式） */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10}
+    .modal.show{display:flex}
+    .modal-content{background:#fff;width:90%;max-width:420px;border-radius:12px;overflow:hidden}
+    .modal-header{padding:16px;border-bottom:.5px solid #e5e5e5;display:flex;justify-content:space-between;align-items:center}
+    .modal-title{font-size:17px;font-weight:600}
+    .modal-close{font-size:24px;color:#999;cursor:pointer;padding:4px}
+    .modal-body{padding:16px;max-height:60vh;overflow-y:auto}
+    .form-group{margin-bottom:16px}
+    .form-label{display:block;font-size:14px;color:#666;margin-bottom:8px}
+    .form-input{width:100%;padding:12px;border:1px solid #e5e5e5;border-radius:8px;font-size:16px}
+    .form-textarea{width:100%;padding:12px;border:1px solid #e5e5e5;border-radius:8px;font-size:16px;min-height:100px;resize:vertical}
+    .avatar-upload{width:80px;height:80px;border-radius:8px;border:2px dashed #e5e5e5;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+    .avatar-upload img{width:100%;height:100%;object-fit:cover}
+    .btns{display:flex;gap:10px}
+    .btn{flex:1;padding:12px;border:none;border-radius:8px;font-size:16px;cursor:pointer}
+    .btn.primary{background:#07c160;color:#fff}
+    .btn.ghost{background:#f2f2f2;color:#111}
+  </style>
+</head>
+<body>
+  <div class="chat-app">
+    <div class="chat-navbar">
+      <div class="chat-back" id="backBtn">◀</div>
+      <div class="chat-title" id="title">聊天</div>
+      <div class="chat-more" id="moreBtn">⋯</div>
+    </div>
+
+    <div class="chat-list" id="chatList"></div>
+
+    <div class="input-bar">
+      <input id="ipt" class="ipt" placeholder="发消息..." />
+      <button id="sendBtn" class="send">发送</button>
+    </div>
+  </div>
+
+  <!-- 编辑角色弹窗 -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">编辑角色</div>
+        <div class="modal-close" id="modalClose">×</div>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="form-group">
+            <label class="form-label">头像</label>
+            <div class="avatar-upload" id="avatarUpload"><span>📷</span></div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none">
+          </div>
+          <div class="form-group">
+            <label class="form-label">姓名</label>
+            <input type="text" id="nameInput" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">昵称</label>
+            <input type="text" id="nickInput" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">人设</label>
+            <textarea id="bioInput" class="form-textarea" required></textarea>
+          </div>
+          <div class="btns">
+            <button type="button" class="btn ghost" id="cancelEdit">取消</button>
+            <button type="submit" class="btn primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    'use strict';
+
+    const $ = s => document.querySelector(s);
+    const chat = $('#chatList');
+    const ipt  = $('#ipt');
+    const titleEl = $('#title');
+
+    /* 读取 id 和角色 */
+    const urlParams   = new URLSearchParams(location.search);
+    const characterId = urlParams.get('id') || sessionStorage.getItem('currentChatId') || 'nash';
+
+    let characters = [];
+    let current = null;
+
+    function loadCharacters(){
+      try{
+        const stored = localStorage.getItem('eg_characters_v2');
+        characters = stored ? JSON.parse(stored) : [];
+      }catch(e){ characters = []; }
+      if (!characters.length){
+        characters = [{
+          id:'nash', name:'Nash', nickname:'Nash', bio:'天真开朗的小狐狸', avatar:'🦊', lastTime:'12:00'
+        }];
+        localStorage.setItem('eg_characters_v2', JSON.stringify(characters));
+      }
+      current = characters.find(c=>c.id===characterId) || characters[0];
+    }
+    loadCharacters();
+
+    /* 标题与更多按钮 */
+    titleEl.textContent = current.nickname || current.name || '聊天';
+
+    $('#backBtn').addEventListener('click', () => {
+      // 在 app 容器里
+      if (window.openAppPage) {
+        window.openAppPage('message.html');
+        return;
+      }
+      // 有历史就返回
+      if (history.length > 1) { history.back(); return; }
+      // 兜底：相对跳转
+      location.href = 'message.html';
+    });
+
+    /* 渲染一条消息（不自动回复） */
+    function push(type, text){
+      if (!text) return;
+      const row = document.createElement('div');
+      row.className = 'row ' + (type === 'me' ? 'me' : 'you');
+
+      // 头像
+      const ava = document.createElement('div');
+      ava.className = 'avatar';
+      let av = (type === 'me') ? '👤' : (current.avatar || '👤');
+      if (av.indexOf('data:')===0 || av.indexOf('http')===0){
+        const img = document.createElement('img');
+        img.src = av; ava.appendChild(img);
+      }else{
+        ava.textContent = av;
+      }
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+
+      if (type === 'me'){
+        // 我方：先气泡再头像
+        row.appendChild(bubble);
+        row.appendChild(ava);
+      }else{
+        row.appendChild(ava);
+        row.appendChild(bubble);
+      }
+
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    /* 发送，仅把“我”的消息放进来，不做本地自动回复 */
+    $('#sendBtn').addEventListener('click', send);
+    ipt.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); send(); }});
+
+    function send(){
+      const text = ipt.value.trim();
+      if (!text) return;
+      push('me', text);
+      ipt.value = '';
+      // 这里以后再接入 LLM，当前不做本地回复
+    }
+
+    /* ============ 右上角 “···” 编辑 ============ */
+    const editModal   = $('#editModal');
+    const avatarUpload= $('#avatarUpload');
+    const avatarInput = $('#avatarInput');
+    const nameInput   = $('#nameInput');
+    const nickInput   = $('#nickInput');
+    const bioInput    = $('#bioInput');
+
+    // 打开时填充
+    $('#moreBtn').addEventListener('click', () => {
+      nameInput.value = current.name || '';
+      nickInput.value = current.nickname || '';
+      bioInput.value  = current.bio || '';
+      if (current.avatar && (current.avatar.startsWith('data:') || current.avatar.startsWith('http'))) {
+        avatarUpload.innerHTML = '<img src="'+current.avatar+'">';
+      } else {
+        avatarUpload.innerHTML = current.avatar || '👤';
+      }
+      editModal.classList.add('show');
+    });
+
+    // 头像选择
+    avatarUpload.addEventListener('click', ()=> avatarInput.click());
+    avatarInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        avatarUpload.innerHTML = '<img src="'+ev.target.result+'">';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // 关闭
+    $('#modalClose').addEventListener('click', ()=> editModal.classList.remove('show'));
+    $('#cancelEdit').addEventListener('click', ()=> editModal.classList.remove('show'));
+    editModal.addEventListener('click', e => { if (e.target.id === 'editModal') editModal.classList.remove('show'); });
+
+    // 保存
+    $('#editForm').addEventListener('submit', e => {
+      e.preventDefault();
+
+      // 新头像
+      let newAvatar = current.avatar || '👤';
+      const img = avatarUpload.querySelector('img');
+      if (img) newAvatar = img.src; else newAvatar = avatarUpload.textContent || '👤';
+
+      current.name     = nameInput.value.trim() || current.name;
+      current.nickname = nickInput.value.trim() || current.nickname || current.name;
+      current.bio      = bioInput.value.trim() || current.bio;
+      current.avatar   = newAvatar;
+
+      // 写回 localStorage
+      const idx = characters.findIndex(c => c.id === current.id);
+      if (idx >= 0) characters[idx] = current;
+      localStorage.setItem('eg_characters_v2', JSON.stringify(characters));
+
+      // 更新标题
+      titleEl.textContent = current.nickname || current.name || '聊天';
+      editModal.classList.remove('show');
+      alert('已保存');
+    });
+
+    /* 首屏可以给一条演示（可选，留空即可） */
+    // push('you', '你好呀～'); // 如需演示可打开
+
+  })();
+  </script>
+</body>
+</html>
