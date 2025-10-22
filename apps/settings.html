@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <title>设置</title>
+<link rel="apple-touch-icon" sizes="512x512" href="../assets/icons/icon512.png">
+<link rel="icon" href="../assets/icons/icon512.png" type="image/png">
 <style>
   :root{
     --safe-top: env(safe-area-inset-top,0px);
@@ -11,6 +13,8 @@
   }
   html,body{height:100%;margin:0;}
   body{background:#f2f2f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#111;}
+
+  /* 顶部导航（含返回） */
   .nav{
     position:sticky; top:0;
     padding-top: calc(12px + var(--safe-top));
@@ -19,16 +23,17 @@
     display:flex; align-items:flex-end; justify-content:center;
     border-bottom:0.5px solid #ddd;
   }
-  .nav .back{position:absolute; left:12px; bottom:8px; padding:6px 8px; border-radius:10px;}
+  .nav .back{position:absolute; left:12px; bottom:8px; padding:6px 8px; border-radius:10px; cursor:pointer;}
   .nav .back:active{background:rgba(0,0,0,.06)}
   .nav h1{font-size:17px; font-weight:600; margin:0 32px 8px; line-height:20px;}
+
   .section-title{margin:16px 16px 8px; font-size:13px; color:#6d6d72}
   .card{background:#fff; border-radius:12px; margin:0 16px; overflow:hidden; box-shadow:0 1px 0 rgba(0,0,0,.06);}
   .row{display:flex; align-items:center; padding:12px 16px; border-bottom:0.5px solid #eee;}
   .row:last-child{border-bottom:none;}
-  .label{width:82px; font-size:15px; color:#111; flex:0 0 82px}
+  .label{width:92px; font-size:15px; color:#111; flex:0 0 92px}
   .ctrl{flex:1; display:flex; align-items:center; gap:12px}
-  input[type="text"]{
+  input[type="text"], input[type="number"]{
     width:100%; border:0; background:#f2f2f7; border-radius:10px; padding:10px 12px; font-size:15px; color:#111;
   }
   select{
@@ -36,17 +41,20 @@
   }
   .btn{
     display:inline-flex; align-items:center; justify-content:center;
-    height:34px; padding:0 14px; border-radius:10px; border:0;
+    height:34px; padding:0 14px; border-radius:10px; border:0; cursor:pointer;
     background:#e9f0ff; color:#1677ff; font-size:14px; font-weight:600; letter-spacing:.2px;
   }
   .btn:active{filter:brightness(.95)}
+  .btn-secondary{background:#ededed; color:#222}
+  .btn-primary{background:#34c759; color:#fff}
+
+  .hint{font-size:13px; color:#6d6d72; margin:12px 16px}
+
+  /* 底部操作条 */
   .footer{
     padding:16px; display:flex; gap:12px; position:sticky; bottom:0; background:linear-gradient(to top,#f2f2f7 70%,transparent);
     padding-bottom: calc(16px + var(--safe-bottom));
   }
-  .btn-secondary{background:#ededed; color:#222}
-  .btn-primary{background:#34c759; color:#fff}
-  .hint{font-size:13px; color:#6d6d72; margin:12px 16px}
 </style>
 </head>
 <body>
@@ -55,6 +63,7 @@
     <h1>设置</h1>
   </div>
 
+  <!-- 主模型 -->
   <div class="section-title">主模型（用于聊天/日记/心声）</div>
   <div class="card">
     <div class="row">
@@ -76,6 +85,7 @@
   </div>
   <div class="hint">如你的网关兼容 OpenAI 接口，"拉取模型"会尝试请求 /models；若跨域受限，会自动使用本地示例列表。</div>
 
+  <!-- 副模型 -->
   <div class="section-title">副模型（用于总结角色短/长期记忆）</div>
   <div class="card">
     <div class="row">
@@ -96,6 +106,19 @@
     </div>
   </div>
 
+  <!-- 聊天体验 -->
+  <div class="section-title">聊天体验</div>
+  <div class="card">
+    <div class="row">
+      <div class="label">回复延迟(秒)</div>
+      <div class="ctrl">
+        <input id="reply_delay" type="number" min="0" step="1" placeholder="5" inputmode="numeric" />
+        <button class="btn" id="delay_save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部 -->
   <div class="footer">
     <button class="btn btn-secondary" id="clearAll">清空本地配置</button>
     <button class="btn" id="toChat">去聊天测试</button>
@@ -107,8 +130,10 @@
     main: 'eg_main_model_cfg',
     sub:  'eg_sub_model_cfg'
   };
+  const DELAY_KEY = 'eg_reply_delay_ms';
   const $ = s => document.querySelector(s);
 
+  // —— 通用读写 —— //
   function load(key, map){
     try{
       const raw = localStorage.getItem(key);
@@ -119,24 +144,25 @@
   }
   function save(key, map){
     const cfg = {};
-    for(const k in map){ cfg[k] = map[k].value.trim(); }
+    for(const k in map){ cfg[k] = (map[k].value || '').trim(); }
     localStorage.setItem(key, JSON.stringify(cfg));
     alert('已保存');
   }
 
+  // —— 映射 —— //
   const mainMap = { apiKey:$('#main_key'), base:$('#main_base'), model:$('#main_model') };
   const subMap  = { apiKey:$('#sub_key'),  base:$('#sub_base'),  model:$('#sub_model')  };
 
+  // —— 读取已保存配置 —— //
   load(LS.main, mainMap);
   load(LS.sub,  subMap);
 
-  $('#main_save').onclick = () => save(LS.main, mainMap);
-  $('#sub_save').onclick  = () => save(LS.sub,  subMap);
-
+  // —— 拉取模型（带 demo 回退） —— //
   async function fetchModels(base, key){
     const demo = ['gpt-4o-mini','gpt-4o','gpt-4.1','o3-mini','o3'];
     try{
-      const url = (base.replace(/\/+$/,'') || '') + '/models';
+      const url = (base || '').replace(/\/+$/,'') + '/models';
+      if (!url.startsWith('http')) throw new Error('invalid base');
       const r = await fetch(url, {headers:{'Authorization':'Bearer '+key}});
       if(!r.ok) throw new Error('HTTP '+r.status);
       const j = await r.json();
@@ -149,47 +175,70 @@
   function fillSelect(sel, arr){
     sel.innerHTML = arr.map(m=>`<option value="${m}">${m}</option>`).join('');
   }
+
+  // 事件：主/副模型保存与拉取
+  $('#main_save').onclick = () => save(LS.main, mainMap);
+  $('#sub_save').onclick  = () => save(LS.sub,  subMap);
+
   $('#main_fetch').onclick = async ()=>{
-    const arr = await fetchModels(mainMap.base.value, mainMap.apiKey.value);
+    const arr = await fetchModels(mainMap.base.value.trim(), mainMap.apiKey.value.trim());
     fillSelect(mainMap.model, arr);
   };
   $('#sub_fetch').onclick = async ()=>{
-    const arr = await fetchModels(subMap.base.value, subMap.apiKey.value);
+    const arr = await fetchModels(subMap.base.value.trim(), subMap.apiKey.value.trim());
     fillSelect(subMap.model, arr);
   };
 
-  // 返回 - 修复：调用主页面的 closeApp
-  $('#backBtn').onclick = function(){
-    if (window.closeApp) {
-      window.closeApp();
-    } else if (window.parent && window.parent.closeApp) {
-      window.parent.closeApp();
-    } else if (history.length > 1) {
-      history.back();
+  // —— 回复延迟(秒) —— //
+  const delayInput   = $('#reply_delay');
+  const delaySaveBtn = $('#delay_save');
+
+  // 读
+  (function initDelay(){
+    const raw = localStorage.getItem(DELAY_KEY);
+    if (raw != null){
+      const ms = parseInt(raw, 10);
+      if (!isNaN(ms)) delayInput.value = Math.round(ms/1000);
     } else {
-      location.href = '../index.html';
+      delayInput.placeholder = '5';
     }
+  })();
+
+  // 存
+  delaySaveBtn.onclick = function(){
+    const sec = Math.max(0, Number(delayInput.value || 0));
+    const ms  = Math.round(sec * 1000);
+    localStorage.setItem(DELAY_KEY, String(ms));
+    alert('已保存（' + sec + ' 秒）');
   };
 
+  // —— 返回：适配 app-container / 直接打开 —— //
+  $('#backBtn').onclick = function(){
+    if (window.closeApp) { window.closeApp(); return; }
+    if (window.parent && window.parent.closeApp) { window.parent.closeApp(); return; }
+    if (history.length > 1) { history.back(); return; }
+    location.href = '../index.html';
+  };
+
+  // —— 清空全部设置 —— //
   $('#clearAll').onclick = ()=>{
     localStorage.removeItem(LS.main);
     localStorage.removeItem(LS.sub);
+    localStorage.removeItem(DELAY_KEY);
     alert('已清空');
     location.reload();
   };
 
-  // 去聊天测试 - 修复：跳转到消息列表
+  // —— 去聊天测试（在首页容器内打开“消息”应用） —— //
   $('#toChat').onclick = ()=>{
     if (window.closeApp) {
-      // 如果是通过 index 打开的，先关闭设置，再打开消息
       window.closeApp();
-      setTimeout(() => {
+      setTimeout(()=>{
         if (window.parent && window.parent.loadApp) {
           window.parent.loadApp('message');
         }
       }, 100);
     } else {
-      // 独立打开的，直接跳转
       location.href = './message.html';
     }
   };
