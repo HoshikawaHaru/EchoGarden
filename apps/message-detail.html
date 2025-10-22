@@ -11,7 +11,7 @@
     :root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
     html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#ededed;color:#111}
 
-    /* 顶部导航：固定 */
+    /* 顶部导航：固定在视口顶部，不受键盘影响 */
     .chat-app{position:fixed;inset:0;overflow:hidden}
     .chat-navbar{
       position:fixed;left:0;right:0;top:0;z-index:10;
@@ -34,23 +34,26 @@
     .row.you .bubble{background:#fff;border:1px solid #eaeaea}
     .row.me  .bubble{background:#95ec69}
 
-    /* 底部输入框：固定（记得有 id="inputBar"） */
+    /* 底部输入框：固定在窗口底部，包含安全区域 */
     .input-bar{
       position:fixed;left:0;right:0;bottom:0;z-index:11;
       background:#f7f7f7;border-top:.5px solid #d9d9d9;
-      padding:8px 10px calc(8px + var(--safe-bottom));display:flex;gap:8px;align-items:center
+      padding:8px 10px;
+      padding-bottom:calc(8px + var(--safe-bottom));
+      display:flex;gap:8px;align-items:center;
+      min-height:calc(52px + var(--safe-bottom));
     }
     .ipt{flex:1;background:#fff;border:1px solid #e1e1e1;border-radius:18px;padding:10px 14px;font-size:16px;outline:none}
     .send{background:#07c160;color:#fff;border:none;border-radius:18px;padding:10px 14px;font-size:15px;cursor:pointer}
     .send:active{background:#06ad56}
 
-    /* 标题“对方正在输入…”三点动画 */
+    /* 标题"对方正在输入…"三点动画 */
     .title-typing .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#666;margin:0 1px;opacity:.5;animation:blink 1.2s infinite}
     .title-typing .dot:nth-child(2){animation-delay:.2s}
     .title-typing .dot:nth-child(3){animation-delay:.4s}
     @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
-    /* 编辑弹窗（复刻“添加角色”的样式） */
+    /* 编辑弹窗（复刻"添加角色"的样式） */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:20}
     .modal.show{display:flex}
     .modal-content{background:#fff;width:90%;max-width:420px;border-radius:12px;overflow:hidden}
@@ -134,24 +137,54 @@
   const inputBar = $('#inputBar');
 
   /* ========== 布局：顶/底固定 + 键盘适配（iOS/Android） ========== */
-  function layout(unsafeBottom = 0){
-    const topPx    = nav.offsetHeight;
-    const bottomPx = inputBar.offsetHeight + unsafeBottom;
-    chat.style.top    = topPx + 'px';
-    chat.style.bottom = bottomPx + 'px';
+  function layout(){
+    const navHeight = nav.offsetHeight;
+    const inputHeight = inputBar.offsetHeight;
+    
+    chat.style.top = navHeight + 'px';
+    chat.style.bottom = inputHeight + 'px';
   }
+
   function bindKeyboardFit(){
-    if (!window.visualViewport){ layout(); return; }
+    // 初始布局
+    layout();
+    
+    if (!window.visualViewport) return;
+    
     const vv = window.visualViewport;
+    
     const onVV = () => {
-      const unsafe = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)); // 键盘高度估计
-      inputBar.style.transform = `translateY(-${unsafe}px)`;
-      layout(unsafe);
-      chat.scrollTop = chat.scrollHeight;
+      // 计算键盘占用的高度
+      const windowHeight = window.innerHeight;
+      const viewportHeight = vv.height;
+      const keyboardHeight = windowHeight - viewportHeight;
+      
+      if (keyboardHeight > 0) {
+        // 键盘弹起时，只移动输入框向上
+        inputBar.style.position = 'fixed';
+        inputBar.style.bottom = `${keyboardHeight}px`;
+        
+        // 重新计算聊天区域的底部位置
+        const inputBarRect = inputBar.getBoundingClientRect();
+        chat.style.bottom = `${windowHeight - inputBarRect.top}px`;
+      } else {
+        // 键盘收起时，恢复原状
+        inputBar.style.position = 'fixed';
+        inputBar.style.bottom = '0';
+        layout();
+      }
+      
+      // 滚动到底部
+      setTimeout(() => {
+        chat.scrollTop = chat.scrollHeight;
+      }, 100);
     };
+    
     vv.addEventListener('resize', onVV);
     vv.addEventListener('scroll', onVV);
-    onVV();
+    
+    // 监听窗口大小变化（兼容性处理）
+    window.addEventListener('resize', onVV);
   }
 
   /* ========== 读取 id 与角色 ========== */
@@ -224,7 +257,7 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
-  /* ========== 顶部“对方正在输入…” ========== */
+  /* ========== 顶部"对方正在输入…" ========== */
   let typingTicker = null;
   function setTitleTyping(isTyping){
     if (isTyping){
@@ -254,7 +287,7 @@
     if (isStreaming || !bufferMsgs.length) return;
     const threads = getThreads();
     const mine    = threads[characterId] || (threads[characterId] = { id: characterId, messages: [] });
-    // 将 buffer 合并成一句发给 LLM（对外展示仍然保留原先多条“我”的气泡）
+    // 将 buffer 合并成一句发给 LLM（对外展示仍然保留原先多条"我"的气泡）
     const merged = bufferMsgs.join(' ');
     bufferMsgs = [];
     saveThreads(threads);
@@ -308,7 +341,7 @@
 【对话规则】
 - 不要长篇大段；必要时可提出一个轻量反问推动话题。
 - 避免表情符号滥用（最多 1 个）。
-- 真正像 ${name} 在聊天，而不是“AI 助手”。`.trim();
+- 真正像 ${name} 在聊天，而不是"AI 助手"。`.trim();
   }
 
   function splitChunks(t){
